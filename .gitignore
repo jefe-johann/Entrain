@@ -26,3 +26,16 @@ config-presets/config-riches.yaml
 
 # OS
 .DS_Store
+
+# Claude
+CLAUDE.md
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node.js (for entrain-web)
+node_modules/
+.next/
