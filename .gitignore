@@ -1,0 +1,28 @@
+# Environment variables - NEVER commit
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Audio files
+*.wav
+*.mp3
+*.flac
+
+# Generated audio output
+complete/
+
+# Personal config presets (keep only config.yaml for public sharing)
+config-presets/config-girlfriend.yaml
+config-presets/config-carey.yaml
+config-presets/config-riches.yaml
+
+# OS
+.DS_Store
