@@ -1,7 +1,11 @@
+import math
+
 from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional, List
 from enum import Enum
+
+AFFIRMATIONS_PER_CREDIT = 50
 
 
 class BinauralPreset(str, Enum):
@@ -45,7 +49,11 @@ class JobConfig(BaseModel):
     binaural_volume_db: float = Field(default=-12, ge=-30, le=0)
     voice_settings: VoiceSettings = Field(default_factory=VoiceSettings)
     lowpass_filter: LowpassFilter = Field(default_factory=LowpassFilter)
-    repetitions: int = Field(default=3, ge=1, le=10)
+    repetitions: int = Field(default=1, ge=1, le=10)
+
+    def credits_required(self) -> int:
+        total = len(self.affirmations) * self.repetitions
+        return max(1, math.ceil(total / AFFIRMATIONS_PER_CREDIT))
 
     def get_binaural_frequency(self) -> float:
         """Get the actual binaural frequency, resolving preset if needed."""

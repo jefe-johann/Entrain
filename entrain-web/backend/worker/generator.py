@@ -256,7 +256,7 @@ def generate_meditation(
     binaural_volume_db = config.get('binaural_volume_db', -12)
     voice_settings = config.get('voice_settings', {})
     lowpass_config = config.get('lowpass_filter', {'enabled': True, 'cutoff_hz': 3750})
-    repetitions = config.get('repetitions', 3)
+    repetitions = config.get('repetitions', 1)
 
     sample_rate = DEFAULT_SAMPLE_RATE
     duration_seconds = duration_minutes * 60

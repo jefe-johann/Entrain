@@ -43,6 +43,8 @@ const BINAURAL_PRESETS = [
   { id: "beta", name: "Beta (20 Hz)", description: "Focus, alertness" },
 ];
 
+const AFFIRMATIONS_PER_CREDIT = 50;
+
 const formSchema = z.object({
   title: z.string().max(100).optional(),
   affirmations: z.string().min(1, "Please enter at least one affirmation"),
@@ -84,13 +86,18 @@ export function GeneratorForm({ userEmail, credits }: GeneratorFormProps) {
       voice_similarity: 0.75,
       lowpass_enabled: true,
       lowpass_cutoff: 3750,
-      repetitions: 3,
+      repetitions: 1,
     },
   });
 
   const onSubmit = async (values: FormValues) => {
-    if (credits < 1) {
-      toast.error("Insufficient credits. Please purchase more to continue.");
+    const affirmationCount = values.affirmations
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0).length;
+    const creditsNeeded = Math.max(1, Math.ceil((affirmationCount * values.repetitions) / AFFIRMATIONS_PER_CREDIT));
+    if (credits < creditsNeeded) {
+      toast.error(`Insufficient credits. This job requires ${creditsNeeded} credit${creditsNeeded !== 1 ? "s" : ""} but you have ${credits}.`);
       return;
     }
 
@@ -181,6 +188,20 @@ My life is filled with joy and purpose`}
             {form.formState.errors.affirmations.message}
           </p>
         )}
+        {(() => {
+          const affirmationsText = form.watch("affirmations");
+          const repetitions = form.watch("repetitions");
+          const count = affirmationsText
+            .split("\n")
+            .map((line: string) => line.trim())
+            .filter((line: string) => line.length > 0).length;
+          const total = count * repetitions;
+          return (
+            <p className="text-sm text-muted-foreground">
+              {count} affirmation{count !== 1 ? "s" : ""} x {repetitions} repetition{repetitions !== 1 ? "s" : ""} = {total} / {AFFIRMATIONS_PER_CREDIT} per credit
+            </p>
+          );
+        })()}
       </div>
 
       {/* Basic Settings */}
@@ -350,9 +371,21 @@ My life is filled with joy and purpose`}
         <p className="text-sm text-muted-foreground">
           Credits remaining: {credits}
         </p>
-        <Button type="submit" size="lg" disabled={isSubmitting || credits < 1}>
-          {isSubmitting ? "Creating..." : "Generate Track (1 credit)"}
-        </Button>
+        {(() => {
+          const affirmationsText = form.watch("affirmations");
+          const repetitions = form.watch("repetitions");
+          const count = affirmationsText
+            .split("\n")
+            .map((line: string) => line.trim())
+            .filter((line: string) => line.length > 0).length;
+          const total = count * repetitions;
+          const creditsRequired = Math.max(1, Math.ceil(total / AFFIRMATIONS_PER_CREDIT));
+          return (
+            <Button type="submit" size="lg" disabled={isSubmitting || credits < creditsRequired}>
+              {isSubmitting ? "Creating..." : `Generate Track (${creditsRequired} credit${creditsRequired !== 1 ? "s" : ""})`}
+            </Button>
+          );
+        })()}
       </div>
     </form>
   );

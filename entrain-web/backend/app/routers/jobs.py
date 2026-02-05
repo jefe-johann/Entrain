@@ -38,13 +38,14 @@ def create_job(
 
     # Check and deduct credits (skip in dev mode)
     settings = get_settings()
+    credits_needed = job_data.config.credits_required()
     if not settings.dev_unlimited_credits:
-        if user.credits < 1:
+        if user.credits < credits_needed:
             raise HTTPException(
                 status_code=402,
-                detail="Insufficient credits. Please purchase more credits to continue.",
+                detail=f"Insufficient credits. This job requires {credits_needed} credit{'s' if credits_needed != 1 else ''} but you have {user.credits}.",
             )
-        user.credits -= 1
+        user.credits -= credits_needed
 
     # Create job record
     job = Job(
