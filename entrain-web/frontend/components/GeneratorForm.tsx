@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Music, Mic2, Settings2, Repeat } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,6 +65,15 @@ type FormValues = z.infer<typeof formSchema>;
 interface GeneratorFormProps {
   userEmail: string;
   credits: number;
+}
+
+function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
+  return (
+    <div className="flex items-center gap-2 pb-1">
+      <Icon className="w-4 h-4 text-purple-500" />
+      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">{title}</h3>
+    </div>
+  );
 }
 
 export function GeneratorForm({ userEmail, credits }: GeneratorFormProps) {
@@ -154,141 +163,174 @@ export function GeneratorForm({ userEmail, credits }: GeneratorFormProps) {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      {/* Title */}
-      <div className="space-y-2">
-        <Label htmlFor="title">Track Title</Label>
-        <Input
-          id="title"
-          placeholder="e.g., Morning Affirmations, Sleep Meditation, Confidence Boost"
-          {...form.register("title")}
-        />
-        {form.formState.errors.title && (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.title.message}
-          </p>
-        )}
-      </div>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      {/* Content Section */}
+      <div className="space-y-4">
+        <SectionHeader icon={Music} title="Content" />
 
-      {/* Affirmations */}
-      <div className="space-y-2">
-        <Label htmlFor="affirmations">Affirmations</Label>
-        <Textarea
-          id="affirmations"
-          placeholder={`Enter your affirmations, one per line. Example:
+        {/* Title */}
+        <div className="space-y-2">
+          <Label htmlFor="title">Track Title</Label>
+          <Input
+            id="title"
+            placeholder="e.g., Morning Affirmations, Sleep Meditation, Confidence Boost"
+            className="bg-white/60"
+            {...form.register("title")}
+          />
+          {form.formState.errors.title && (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.title.message}
+            </p>
+          )}
+        </div>
+
+        {/* Affirmations */}
+        <div className="space-y-2">
+          <Label htmlFor="affirmations">Affirmations</Label>
+          <Textarea
+            id="affirmations"
+            placeholder={`Enter your affirmations, one per line. Example:
 
 I am confident and capable
 I attract abundance effortlessly
 My life is filled with joy and purpose`}
-          className="min-h-[200px]"
-          {...form.register("affirmations")}
-        />
-        {form.formState.errors.affirmations && (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.affirmations.message}
-          </p>
-        )}
-        {(() => {
-          const affirmationsText = form.watch("affirmations");
-          const repetitions = form.watch("repetitions");
-          const count = affirmationsText
-            .split("\n")
-            .map((line: string) => line.trim())
-            .filter((line: string) => line.length > 0).length;
-          const total = count * repetitions;
-          return (
-            <p className="text-sm text-muted-foreground">
-              {count} affirmation{count !== 1 ? "s" : ""} x {repetitions} repetition{repetitions !== 1 ? "s" : ""} = {total} / {AFFIRMATIONS_PER_CREDIT} per credit
+            className="min-h-[200px] bg-white/60"
+            {...form.register("affirmations")}
+          />
+          {form.formState.errors.affirmations && (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.affirmations.message}
             </p>
-          );
-        })()}
-      </div>
-
-      {/* Basic Settings */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Voice */}
-        <div className="space-y-2">
-          <Label htmlFor="voice">Voice</Label>
-          <Select
-            value={form.watch("voice_id")}
-            onValueChange={(value) => form.setValue("voice_id", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a voice" />
-            </SelectTrigger>
-            <SelectContent>
-              {VOICES.map((voice) => (
-                <SelectItem key={voice.id} value={voice.id}>
-                  {voice.name} - {voice.description}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Duration */}
-        <div className="space-y-2">
-          <Label>Duration: {form.watch("duration_minutes")} minutes</Label>
-          <Slider
-            value={[form.watch("duration_minutes")]}
-            onValueChange={([value]) => form.setValue("duration_minutes", value)}
-            min={10}
-            max={60}
-            step={5}
-          />
-        </div>
-
-        {/* Binaural Preset */}
-        <div className="space-y-2">
-          <Label>Binaural Frequency</Label>
-          <Select
-            value={form.watch("binaural_preset")}
-            onValueChange={(value: "delta" | "theta" | "alpha" | "beta") =>
-              form.setValue("binaural_preset", value)
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select frequency" />
-            </SelectTrigger>
-            <SelectContent>
-              {BINAURAL_PRESETS.map((preset) => (
-                <SelectItem key={preset.id} value={preset.id}>
-                  {preset.name} - {preset.description}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Repetitions */}
-        <div className="space-y-2">
-          <Label>Repetitions: {form.watch("repetitions")}x</Label>
-          <Slider
-            value={[form.watch("repetitions")]}
-            onValueChange={([value]) => form.setValue("repetitions", value)}
-            min={1}
-            max={10}
-            step={1}
-          />
+          )}
+          {(() => {
+            const affirmationsText = form.watch("affirmations");
+            const repetitions = form.watch("repetitions");
+            const count = affirmationsText
+              .split("\n")
+              .map((line: string) => line.trim())
+              .filter((line: string) => line.length > 0).length;
+            const total = count * repetitions;
+            return (
+              <p className="text-sm text-muted-foreground">
+                {count} affirmation{count !== 1 ? "s" : ""} x {repetitions} repetition{repetitions !== 1 ? "s" : ""} = {total} / {AFFIRMATIONS_PER_CREDIT} per credit
+              </p>
+            );
+          })()}
         </div>
       </div>
+
+      {/* Divider */}
+      <div className="border-t border-border/60" />
+
+      {/* Audio Settings Section */}
+      <div className="space-y-4">
+        <SectionHeader icon={Mic2} title="Voice & Audio" />
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Voice */}
+          <div className="space-y-2">
+            <Label htmlFor="voice">Voice</Label>
+            <Select
+              value={form.watch("voice_id")}
+              onValueChange={(value) => form.setValue("voice_id", value)}
+            >
+              <SelectTrigger className="bg-white/60">
+                <SelectValue placeholder="Select a voice" />
+              </SelectTrigger>
+              <SelectContent>
+                {VOICES.map((voice) => (
+                  <SelectItem key={voice.id} value={voice.id}>
+                    {voice.name} - {voice.description}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Binaural Preset */}
+          <div className="space-y-2">
+            <Label>Binaural Frequency</Label>
+            <Select
+              value={form.watch("binaural_preset")}
+              onValueChange={(value: "delta" | "theta" | "alpha" | "beta") =>
+                form.setValue("binaural_preset", value)
+              }
+            >
+              <SelectTrigger className="bg-white/60">
+                <SelectValue placeholder="Select frequency" />
+              </SelectTrigger>
+              <SelectContent>
+                {BINAURAL_PRESETS.map((preset) => (
+                  <SelectItem key={preset.id} value={preset.id}>
+                    {preset.name} - {preset.description}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Duration */}
+          <div className="space-y-3">
+            <Label>Duration: {form.watch("duration_minutes")} minutes</Label>
+            <Slider
+              value={[form.watch("duration_minutes")]}
+              onValueChange={([value]) => form.setValue("duration_minutes", value)}
+              min={10}
+              max={60}
+              step={5}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>10 min</span>
+              <span>60 min</span>
+            </div>
+          </div>
+
+          {/* Repetitions */}
+          <div className="space-y-3">
+            <Label className="flex items-center gap-1.5">
+              <Repeat className="w-3.5 h-3.5 text-muted-foreground" />
+              Repetitions: {form.watch("repetitions")}x
+            </Label>
+            <Slider
+              value={[form.watch("repetitions")]}
+              onValueChange={([value]) => form.setValue("repetitions", value)}
+              min={1}
+              max={10}
+              step={1}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>1x</span>
+              <span>10x</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-border/60" />
 
       {/* Advanced Settings */}
       <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
         <CollapsibleTrigger asChild>
-          <Button variant="ghost" className="w-full justify-between">
-            Advanced Settings
+          <button
+            type="button"
+            className="flex items-center justify-between w-full py-1 group"
+          >
+            <div className="flex items-center gap-2">
+              <Settings2 className="w-4 h-4 text-purple-500" />
+              <span className="text-sm font-semibold text-foreground uppercase tracking-wide">Advanced Settings</span>
+            </div>
             <ChevronDown
-              className={`h-4 w-4 transition-transform ${
+              className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
                 advancedOpen ? "rotate-180" : ""
               }`}
             />
-          </Button>
+          </button>
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-6 pt-4">
           <div className="grid gap-6 md:grid-cols-2">
             {/* Affirmation Volume */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>Affirmation Volume: {form.watch("affirmation_volume_db")} dB</Label>
               <Slider
                 value={[form.watch("affirmation_volume_db")]}
@@ -297,10 +339,14 @@ My life is filled with joy and purpose`}
                 max={0}
                 step={1}
               />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>-30 dB</span>
+                <span>0 dB</span>
+              </div>
             </div>
 
             {/* Binaural Volume */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>Binaural Volume: {form.watch("binaural_volume_db")} dB</Label>
               <Slider
                 value={[form.watch("binaural_volume_db")]}
@@ -309,10 +355,14 @@ My life is filled with joy and purpose`}
                 max={0}
                 step={1}
               />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>-30 dB</span>
+                <span>0 dB</span>
+              </div>
             </div>
 
             {/* Voice Stability */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>
                 Voice Stability: {(form.watch("voice_stability") * 100).toFixed(0)}%
               </Label>
@@ -323,10 +373,14 @@ My life is filled with joy and purpose`}
                 max={1}
                 step={0.05}
               />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Variable</span>
+                <span>Stable</span>
+              </div>
             </div>
 
             {/* Voice Similarity */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>
                 Voice Similarity: {(form.watch("voice_similarity") * 100).toFixed(0)}%
               </Label>
@@ -337,12 +391,19 @@ My life is filled with joy and purpose`}
                 max={1}
                 step={0.05}
               />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Low</span>
+                <span>High</span>
+              </div>
             </div>
 
             {/* Lowpass Filter */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="lowpass">Low-pass Filter (softer audio)</Label>
+            <div className="space-y-4 md:col-span-2">
+              <div className="flex items-center justify-between rounded-lg bg-secondary/40 px-4 py-3">
+                <div>
+                  <Label htmlFor="lowpass" className="text-sm font-medium">Low-pass Filter</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">Softens audio by removing high frequencies</p>
+                </div>
                 <Switch
                   id="lowpass"
                   checked={form.watch("lowpass_enabled")}
@@ -350,7 +411,7 @@ My life is filled with joy and purpose`}
                 />
               </div>
               {form.watch("lowpass_enabled") && (
-                <div className="space-y-2">
+                <div className="space-y-3 pl-4">
                   <Label>Cutoff: {form.watch("lowpass_cutoff")} Hz</Label>
                   <Slider
                     value={[form.watch("lowpass_cutoff")]}
@@ -359,6 +420,10 @@ My life is filled with joy and purpose`}
                     max={8000}
                     step={250}
                   />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>2,000 Hz</span>
+                    <span>8,000 Hz</span>
+                  </div>
                 </div>
               )}
             </div>
@@ -367,25 +432,32 @@ My life is filled with joy and purpose`}
       </Collapsible>
 
       {/* Submit */}
-      <div className="flex items-center justify-between pt-4">
-        <p className="text-sm text-muted-foreground">
-          Credits remaining: {credits}
-        </p>
-        {(() => {
-          const affirmationsText = form.watch("affirmations");
-          const repetitions = form.watch("repetitions");
-          const count = affirmationsText
-            .split("\n")
-            .map((line: string) => line.trim())
-            .filter((line: string) => line.length > 0).length;
-          const total = count * repetitions;
-          const creditsRequired = Math.max(1, Math.ceil(total / AFFIRMATIONS_PER_CREDIT));
-          return (
-            <Button type="submit" size="lg" disabled={isSubmitting || credits < creditsRequired}>
-              {isSubmitting ? "Creating..." : `Generate Track (${creditsRequired} credit${creditsRequired !== 1 ? "s" : ""})`}
-            </Button>
-          );
-        })()}
+      <div className="border-t border-border/60 pt-6">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Credits remaining: <span className="font-medium text-foreground">{credits}</span>
+          </p>
+          {(() => {
+            const affirmationsText = form.watch("affirmations");
+            const repetitions = form.watch("repetitions");
+            const count = affirmationsText
+              .split("\n")
+              .map((line: string) => line.trim())
+              .filter((line: string) => line.length > 0).length;
+            const total = count * repetitions;
+            const creditsRequired = Math.max(1, Math.ceil(total / AFFIRMATIONS_PER_CREDIT));
+            return (
+              <Button
+                type="submit"
+                size="lg"
+                disabled={isSubmitting || credits < creditsRequired}
+                className="shadow-md shadow-purple-500/20 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
+              >
+                {isSubmitting ? "Creating..." : `Generate Track (${creditsRequired} credit${creditsRequired !== 1 ? "s" : ""})`}
+              </Button>
+            );
+          })()}
+        </div>
       </div>
     </form>
   );
