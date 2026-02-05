@@ -68,3 +68,40 @@ complete/{voice_name}/         # Output files organized by voice
 - **Audio format**: FLAC output (lossless, ~70% compression), MP3 intermediate (via ElevenLabs)
 - **Low-pass filter**: 5th-order Butterworth, zero-phase distortion
 - **Python**: Requires numpy, scipy, soundfile, elevenlabs, pyyaml, python-dotenv
+
+---
+
+## Web App (`entrain-web/`)
+
+Full-stack web interface for audio generation with user management and async job processing.
+
+**Stack**: Next.js 15 (App Router) + FastAPI + PostgreSQL + Redis + RQ
+
+### Frontend (`frontend/`)
+- **Framework**: Next.js 15 with App Router, TypeScript, Tailwind CSS
+- **Auth**: Auth.js with Google OAuth
+- **Database**: Prisma ORM (schema in `prisma/`)
+- **Pages**: `app/` directory
+  - `/dashboard` - Job history and status
+  - `/generate` - Generation form
+  - `/api/auth/[...nextauth]` - Auth.js routes
+- **Components**: `components/` - Reusable UI components
+- **API Client**: `lib/api.ts` - Backend communication
+
+### Backend (`backend/`)
+- **Framework**: FastAPI with SQLAlchemy
+- **Structure**:
+  - `app/routers/` - API endpoints (users, jobs, files)
+  - `app/models/` - SQLAlchemy database models
+  - `app/schemas/` - Pydantic request/response schemas
+  - `app/services/` - Business logic (queue, storage)
+  - `worker/` - RQ async worker
+    - `generator.py` - Audio generation (uses root `generate.py` logic)
+    - `tasks.py` - RQ task definitions
+    - `run_worker.py` - Worker entry point
+- **Generated files**: `generated_files/{job_id}/` - Temporary audio outputs
+
+### Infrastructure
+- **Docker Compose**: PostgreSQL + Redis (required for dev)
+- **Ports**: Frontend :3000, Backend :8000, Postgres :5432, Redis :6379
+- **Queue**: RQ for async job processing (requires separate worker process)

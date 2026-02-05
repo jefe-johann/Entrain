@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { handleSignOut } from "@/app/actions";
 
@@ -15,8 +16,9 @@ export function Header({ credits }: HeaderProps) {
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold">
-          Entrain
+        <Link href="/" className="flex items-center gap-3">
+          <Image src="/logo.png" alt="Entrain Logo" width={40} height={40} />
+          <span className="text-xl font-bold">Entrain</span>
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/generate">
@@ -24,7 +26,7 @@ export function Header({ credits }: HeaderProps) {
               variant="ghost"
               className={pathname === "/generate" ? "border-b-2 border-primary rounded-none" : ""}
             >
-              New Track
+              Generate
             </Button>
           </Link>
           <Link href="/dashboard">
@@ -32,7 +34,7 @@ export function Header({ credits }: HeaderProps) {
               variant="ghost"
               className={pathname === "/dashboard" ? "border-b-2 border-primary rounded-none" : ""}
             >
-              Dashboard
+              History
             </Button>
           </Link>
           <Link href="/config-notes">

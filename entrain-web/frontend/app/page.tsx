@@ -1,5 +1,6 @@
 import { auth, signIn } from "@/auth";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -16,6 +17,9 @@ export default async function LandingPage() {
       <div className="container mx-auto px-4 py-16">
         {/* Hero Section */}
         <div className="text-center mb-16">
+          <div className="flex justify-center mb-6">
+            <Image src="/logo.png" alt="Entrain Logo" width={120} height={120} />
+          </div>
           <h1 className="text-5xl font-bold tracking-tight mb-4">
             Entrain
           </h1>

@@ -15,10 +15,3 @@
   - User accounts                                                                                                          
   - Usage tracking  
 
-
-
-To run: python generate.py
-To run specific config: python generate.py --config other-config.yaml
-
-
---- 
