@@ -6,6 +6,10 @@ Run the RQ worker for Entrain jobs.
 import os
 import sys
 
+# macOS: Disable fork safety check to prevent crashes when RQ forks workers
+# that use HTTP libraries with Objective-C bindings (like ElevenLabs client)
+os.environ.setdefault("OBJC_DISABLE_INITIALIZE_FORK_SAFETY", "YES")
+
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

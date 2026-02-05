@@ -58,10 +58,44 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete }: JobStatu
     return () => clearInterval(interval);
   }, [isPolling, job.id, userEmail]);
 
-  const handleDownload = () => {
-    const url = api.getDownloadUrl(job.id);
-    // Create a temporary link with auth header workaround
-    window.open(url, "_blank");
+  const handleDownload = async () => {
+    try {
+      api.setUserEmail(userEmail);
+      const url = api.getDownloadUrl(job.id);
+
+      // Fetch with auth headers
+      const response = await fetch(url, {
+        headers: {
+          "X-User-Email": userEmail,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Download failed");
+      }
+
+      // Create blob and trigger download
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+
+      // Generate filename
+      const config = job.config;
+      const voice = config.voice_id || "unknown";
+      const duration = config.duration_minutes || 40;
+      link.download = `meditation-${voice}-${duration}min.flac`;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+
+      toast.success("Download started");
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast.error("Failed to download file");
+    }
   };
 
   const handleDelete = async () => {

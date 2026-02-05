@@ -4,6 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from ..database import get_db
+from ..config import get_settings
 from ..models import User, Job
 from ..schemas import JobCreate, JobResponse, JobStatusResponse
 from ..services import get_queue_service, get_storage_service
@@ -35,15 +36,15 @@ def create_job(
     """Create a new generation job."""
     user = get_user_by_email(email, db)
 
-    # Check credits
-    if user.credits < 1:
-        raise HTTPException(
-            status_code=402,
-            detail="Insufficient credits. Please purchase more credits to continue.",
-        )
-
-    # Deduct credit
-    user.credits -= 1
+    # Check and deduct credits (skip in dev mode)
+    settings = get_settings()
+    if not settings.dev_unlimited_credits:
+        if user.credits < 1:
+            raise HTTPException(
+                status_code=402,
+                detail="Insufficient credits. Please purchase more credits to continue.",
+            )
+        user.credits -= 1
 
     # Create job record
     job = Job(

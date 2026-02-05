@@ -1,8 +1,13 @@
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, JSON, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from datetime import datetime, timezone
 from ..database import Base
 import uuid
+
+
+def utc_now():
+    return datetime.now(timezone.utc)
 
 
 class Job(Base):
@@ -25,8 +30,8 @@ class Job(Base):
     file_path = Column(String, nullable=True)
     file_size_bytes = Column(Integer, nullable=True)
 
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+    updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
     completed_at = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships

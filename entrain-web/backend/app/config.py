@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     # Security
     secret_key: str = "change_me_in_production"
 
+    # Dev mode
+    dev_unlimited_credits: bool = False
+
     class Config:
         env_file = ".env"
 
