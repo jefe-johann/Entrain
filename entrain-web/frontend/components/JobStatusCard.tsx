@@ -82,9 +82,17 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete }: JobStatu
 
       // Generate filename
       const config = job.config;
-      const voice = config.voice_id || "unknown";
-      const duration = config.duration_minutes || 40;
-      link.download = `meditation-${voice}-${duration}min.flac`;
+      if (config.title) {
+        // Use custom title if provided
+        // Sanitize the title for filename (replace invalid chars with hyphens)
+        const sanitizedTitle = config.title.replace(/[/\\?%*:|"<>]/g, '-').trim();
+        link.download = `${sanitizedTitle}.flac`;
+      } else {
+        // Fall back to default format
+        const voice = config.voice_id || "unknown";
+        const duration = config.duration_minutes || 40;
+        link.download = `meditation-${voice}-${duration}min.flac`;
+      }
 
       document.body.appendChild(link);
       link.click();
@@ -138,7 +146,7 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete }: JobStatu
           <div className="flex items-center gap-2">
             {statusIcon[job.status]}
             <CardTitle className="text-lg">
-              {config.voice_id} - {formatDuration(config.duration_minutes || 40)}
+              {config.title || config.voice_id} - {formatDuration(config.duration_minutes || 40)}
             </CardTitle>
           </div>
           <div className="text-sm text-muted-foreground">
@@ -147,6 +155,7 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete }: JobStatu
         </div>
         <CardDescription>
           {affirmationCount} affirmations, {config.binaural_preset || "theta"} wave
+          {config.title && ` • ${config.voice_id} voice`}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

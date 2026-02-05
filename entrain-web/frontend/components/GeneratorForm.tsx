@@ -44,6 +44,7 @@ const BINAURAL_PRESETS = [
 ];
 
 const formSchema = z.object({
+  title: z.string().max(100).optional(),
   affirmations: z.string().min(1, "Please enter at least one affirmation"),
   voice_id: z.string(),
   duration_minutes: z.number().min(10).max(60),
@@ -72,6 +73,7 @@ export function GeneratorForm({ userEmail, credits }: GeneratorFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      title: "",
       affirmations: "",
       voice_id: "Rachel",
       duration_minutes: 40,
@@ -109,6 +111,7 @@ export function GeneratorForm({ userEmail, credits }: GeneratorFormProps) {
       // Build config
       const config: JobConfig = {
         affirmations: affirmationsList,
+        title: values.title || undefined,
         voice_id: values.voice_id,
         duration_minutes: values.duration_minutes,
         binaural_preset: values.binaural_preset,
@@ -145,6 +148,21 @@ export function GeneratorForm({ userEmail, credits }: GeneratorFormProps) {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      {/* Title */}
+      <div className="space-y-2">
+        <Label htmlFor="title">Track Title (optional)</Label>
+        <Input
+          id="title"
+          placeholder="e.g., Morning Affirmations, Sleep Meditation, Confidence Boost"
+          {...form.register("title")}
+        />
+        {form.formState.errors.title && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.title.message}
+          </p>
+        )}
+      </div>
+
       {/* Affirmations */}
       <div className="space-y-2">
         <Label htmlFor="affirmations">Affirmations</Label>

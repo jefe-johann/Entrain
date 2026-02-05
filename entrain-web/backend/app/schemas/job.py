@@ -34,6 +34,7 @@ class JobConfig(BaseModel):
     affirmations: List[str] = Field(..., min_length=1)
 
     # Basic settings
+    title: Optional[str] = Field(default=None, max_length=100)
     voice_id: str = "Rachel"
     duration_minutes: int = Field(default=40, ge=10, le=60)
     binaural_preset: Optional[BinauralPreset] = BinauralPreset.THETA

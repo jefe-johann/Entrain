@@ -6,6 +6,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface JobConfig {
   affirmations: string[];
+  title?: string;
   voice_id?: string;
   duration_minutes?: number;
   binaural_preset?: "delta" | "theta" | "alpha" | "beta";
