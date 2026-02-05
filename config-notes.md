@@ -1,9 +1,3 @@
-To run: python generate.py
-To run specific config: python generate.py --config other-config.yaml
-
-
----
-
 ### 1. "I Am" (The First Person)
 **The Theory:** This aligns the affirmation with your own internal monologue. It is the gold standard for **identity-level change**.
 

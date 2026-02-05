@@ -150,7 +150,7 @@ export function GeneratorForm({ userEmail, credits }: GeneratorFormProps) {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       {/* Title */}
       <div className="space-y-2">
-        <Label htmlFor="title">Track Title (optional)</Label>
+        <Label htmlFor="title">Track Title</Label>
         <Input
           id="title"
           placeholder="e.g., Morning Affirmations, Sleep Meditation, Confidence Boost"
@@ -168,12 +168,11 @@ export function GeneratorForm({ userEmail, credits }: GeneratorFormProps) {
         <Label htmlFor="affirmations">Affirmations</Label>
         <Textarea
           id="affirmations"
-          placeholder="Enter your affirmations, one per line...
+          placeholder={`Enter your affirmations, one per line. Example:
 
-Example:
 I am confident and capable
 I attract abundance effortlessly
-My life is filled with joy and purpose"
+My life is filled with joy and purpose`}
           className="min-h-[200px]"
           {...form.register("affirmations")}
         />
