@@ -23,6 +23,13 @@ export function Header({ credits, isAdmin }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
+      {/* Skip to content link for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-md focus:shadow-lg"
+      >
+        Skip to content
+      </a>
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 group">
           <Image src="/logo.png" alt="Entrain Logo" width={36} height={36} className="group-hover:scale-105 transition-transform" />

@@ -4,6 +4,12 @@ import { Header } from "@/components/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import { GeneratorForm } from "@/components/GeneratorForm";
 import { Headphones } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Generate Track - Entrain",
+  description: "Customize and generate your personalized meditation track with binaural beats and spoken affirmations",
+};
 
 export default async function GeneratePage() {
   const session = await auth();
@@ -20,7 +26,7 @@ export default async function GeneratePage() {
       <div className="relative z-10">
         <Header credits={session.user.credits} isAdmin={session.user.isAdmin} />
 
-        <main className="container mx-auto px-4 py-8">
+        <main id="main-content" className="container mx-auto px-4 py-8">
           {/* Page heading */}
           <div className="max-w-3xl mx-auto mb-6">
             <div className="flex items-center gap-3 mb-2">

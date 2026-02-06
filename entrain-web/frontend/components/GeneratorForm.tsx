@@ -179,7 +179,7 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
             {...form.register("title")}
           />
           {form.formState.errors.title && (
-            <p className="text-sm text-destructive">
+            <p className="text-sm text-destructive" role="alert">
               {form.formState.errors.title.message}
             </p>
           )}
@@ -199,7 +199,7 @@ My life is filled with joy and purpose`}
             {...form.register("affirmations")}
           />
           {form.formState.errors.affirmations && (
-            <p className="text-sm text-destructive">
+            <p className="text-sm text-destructive" role="alert">
               {form.formState.errors.affirmations.message}
             </p>
           )}
@@ -316,6 +316,8 @@ My life is filled with joy and purpose`}
           <button
             type="button"
             className="flex items-center justify-between w-full py-1 group"
+            aria-expanded={advancedOpen}
+            aria-controls="advanced-settings-content"
           >
             <div className="flex items-center gap-2">
               <Settings2 className="w-4 h-4 text-purple-500" />
@@ -328,7 +330,7 @@ My life is filled with joy and purpose`}
             />
           </button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-6 pt-4">
+        <CollapsibleContent className="space-y-6 pt-4" id="advanced-settings-content">
           <div className="grid gap-6 md:grid-cols-2">
             {/* Affirmation Volume */}
             <div className="space-y-3">
