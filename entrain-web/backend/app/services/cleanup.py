@@ -10,6 +10,34 @@ from .storage import get_storage_service
 logger = logging.getLogger(__name__)
 
 
+def recover_stuck_jobs(db: Session) -> int:
+    """Mark orphaned processing/pending jobs as failed.
+
+    After an OOM kill or crash, jobs can be left stuck as 'processing' or
+    'pending' with no worker to pick them up. Mark any that are older than
+    30 minutes as failed so users aren't left waiting.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=30)
+    stuck = (
+        db.query(Job)
+        .filter(
+            Job.status.in_(["processing", "pending"]),
+            Job.created_at < cutoff,
+        )
+        .all()
+    )
+
+    for job in stuck:
+        job.status = "failed"
+        job.error_message = "Generation interrupted by server restart. Please try again."
+
+    if stuck:
+        db.commit()
+        logger.info(f"Recovered {len(stuck)} stuck jobs")
+
+    return len(stuck)
+
+
 def cleanup_expired_jobs(db: Session) -> int:
     """Auto-cleanup expired jobs.
 

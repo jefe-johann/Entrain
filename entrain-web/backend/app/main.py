@@ -94,15 +94,19 @@ async def lifespan(app: FastAPI):
     # Startup: Create database tables
     Base.metadata.create_all(bind=engine)
 
-    # Run cleanup for expired jobs (catches anything missed during Render spin-down)
+    # Recover stuck jobs and clean up expired ones
     try:
         from .database import SessionLocal
         from .services import cleanup_expired_jobs
+        from .services.cleanup import recover_stuck_jobs
         db = SessionLocal()
         try:
+            recovered = recover_stuck_jobs(db)
+            if recovered:
+                logger.info(f"Startup: recovered {recovered} stuck jobs")
             cleaned = cleanup_expired_jobs(db)
             if cleaned:
-                logger.info(f"Startup cleanup: processed {cleaned} expired jobs")
+                logger.info(f"Startup: cleaned up {cleaned} expired jobs")
         finally:
             db.close()
     except Exception as e:

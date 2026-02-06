@@ -52,20 +52,20 @@ def generate_binaural_beat(
     carrier_freq: int,
     binaural_freq: float,
 ) -> np.ndarray:
-    """Generate stereo binaural beat audio."""
-    t = np.linspace(0, duration_seconds, int(sample_rate * duration_seconds), False)
+    """Generate stereo binaural beat audio in chunks to limit memory usage."""
+    total_samples = int(sample_rate * duration_seconds)
+    stereo = np.empty((total_samples, 2), dtype=np.int16)
 
-    # Left ear: carrier frequency
-    left_channel = np.sin(2 * np.pi * carrier_freq * t)
+    # Process in 30-second chunks to stay under ~50 MB per chunk
+    chunk_samples = sample_rate * 30
+    amplitude = 32767 * 0.3
 
-    # Right ear: carrier + binaural frequency
-    right_channel = np.sin(2 * np.pi * (carrier_freq + binaural_freq) * t)
+    for start in range(0, total_samples, chunk_samples):
+        end = min(start + chunk_samples, total_samples)
+        t = np.linspace(start / sample_rate, end / sample_rate, end - start, endpoint=False, dtype=np.float32)
 
-    # Combine into stereo
-    stereo = np.vstack((left_channel, right_channel)).T
-
-    # Normalize to 16-bit range (30% volume for gentle effect)
-    stereo = np.int16(stereo * 32767 * 0.3)
+        stereo[start:end, 0] = np.int16(np.sin(2 * np.pi * carrier_freq * t) * amplitude)
+        stereo[start:end, 1] = np.int16(np.sin(2 * np.pi * (carrier_freq + binaural_freq) * t) * amplitude)
 
     return stereo
 
@@ -148,13 +148,21 @@ def overlay_affirmations_on_binaural(
     lowpass_config: dict,
     progress_callback: Optional[Callable[[int, str], None]] = None,
 ) -> np.ndarray:
-    """Overlay spoken affirmations throughout the binaural beat track."""
-    # Convert binaural from int16 to float32
-    binaural_float = binaural_audio.astype(np.float32) / 32767.0
+    """Overlay spoken affirmations onto binaural beat track (memory-efficient).
 
-    # Apply volume adjustment to binaural beat
-    binaural_volume_factor = 10 ** (binaural_volume_db / 20.0)
-    binaural_float *= binaural_volume_factor
+    Works directly on the int16 binaural array. For each affirmation, converts
+    only the affected region to float32, mixes, and writes back to int16.
+    """
+    binaural_volume_factor = np.float32(10 ** (binaural_volume_db / 20.0))
+    affirmation_volume_factor = np.float32(10 ** (affirmation_volume_db / 20.0))
+
+    # Apply binaural volume in chunks to avoid full float32 copy
+    chunk_size = sample_rate * 30  # 30-second chunks
+    for start in range(0, len(binaural_audio), chunk_size):
+        end = min(start + chunk_size, len(binaural_audio))
+        chunk = binaural_audio[start:end].astype(np.float32) * binaural_volume_factor
+        np.clip(chunk, -32767, 32767, out=chunk)
+        binaural_audio[start:end] = chunk.astype(np.int16)
 
     # Calculate spacing
     num_affirmations = len(affirmations) * repetitions
@@ -166,13 +174,12 @@ def overlay_affirmations_on_binaural(
     shuffled_affirmations = affirmations * repetitions
     random.shuffle(shuffled_affirmations)
 
-    # Volume factor for affirmations
-    affirmation_volume_factor = 10 ** (affirmation_volume_db / 20.0)
-
     total_affirmations = len(shuffled_affirmations)
+    total_samples = len(binaural_audio)
+    end_boundary = total_samples - (30 * sample_rate)
 
     for i, affirmation in enumerate(shuffled_affirmations):
-        if current_sample >= (duration_seconds * sample_rate) - (30 * sample_rate):
+        if current_sample >= end_boundary:
             break
 
         # Report progress (30-90% range for affirmation overlay)
@@ -190,31 +197,25 @@ def overlay_affirmations_on_binaural(
             sample_rate,
         )
 
-        # Convert to float and apply volume
-        speech_float = speech_audio.astype(np.float32) / 32767.0
-        speech_float *= affirmation_volume_factor
+        speech_len = len(speech_audio)
+        end_sample = min(current_sample + speech_len, total_samples)
+        mix_len = end_sample - current_sample
 
-        # Convert mono to stereo
-        speech_stereo = np.column_stack([speech_float, speech_float])
+        # Mix only the affected region in float32, then write back as int16
+        region = binaural_audio[current_sample:end_sample].astype(np.float32)
+        speech_scaled = speech_audio[:mix_len].astype(np.float32) * affirmation_volume_factor
+        region[:, 0] += speech_scaled
+        region[:, 1] += speech_scaled
 
-        # Overlay on binaural track
-        end_sample = min(current_sample + len(speech_stereo), len(binaural_float))
-        speech_length = end_sample - current_sample
-        binaural_float[current_sample:end_sample] += speech_stereo[:speech_length]
+        # Clip to int16 range
+        np.clip(region, -32767, 32767, out=region)
+        binaural_audio[current_sample:end_sample] = region.astype(np.int16)
 
         # Move to next position with randomness
         interval_samples = int(interval * sample_rate)
         current_sample += interval_samples + random.randint(-3 * sample_rate, 3 * sample_rate)
 
-    # Normalize to prevent clipping
-    max_val = np.abs(binaural_float).max()
-    if max_val > 1.0:
-        binaural_float /= max_val
-
-    # Convert back to int16
-    final_audio = np.int16(binaural_float * 32767)
-
-    return final_audio
+    return binaural_audio
 
 
 def generate_meditation(
