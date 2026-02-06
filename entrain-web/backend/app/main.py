@@ -8,6 +8,7 @@ import os
 import logging
 from redis import Redis
 from rq import Queue, SimpleWorker
+from rq.timeouts import TimerDeathPenalty
 
 from .config import get_settings
 from .database import engine, Base
@@ -15,6 +16,18 @@ from .routers import users_router, jobs_router, files_router
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
+
+
+class ThreadSafeWorker(SimpleWorker):
+    """SimpleWorker that can run in a background thread.
+
+    Uses timer-based timeouts instead of Unix signals, and skips
+    signal handler installation (only works in main thread).
+    """
+    death_penalty_class = TimerDeathPenalty
+
+    def _install_signal_handlers(self):
+        pass
 
 # Global worker state
 worker_thread = None
@@ -43,7 +56,7 @@ def run_rq_worker():
 
             # Create queue and worker (use SimpleWorker for thread compatibility)
             queue = Queue("entrain", connection=redis_conn)
-            worker = SimpleWorker([queue], connection=redis_conn)
+            worker = ThreadSafeWorker([queue], connection=redis_conn)
 
             worker_status["alive"] = True
             worker_status["started_at"] = time.time()
