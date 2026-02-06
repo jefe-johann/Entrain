@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import threading
 import os
 from redis import Redis
-from rq import Worker, Queue
+from rq import Queue, SimpleWorker
 
 from .config import get_settings
 from .database import engine, Base
@@ -24,12 +24,13 @@ def run_rq_worker():
     redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
     redis_conn = Redis.from_url(redis_url)
 
-    # Create queue and worker
+    # Create queue and worker (use SimpleWorker for thread compatibility)
     queue = Queue("entrain", connection=redis_conn)
-    worker = Worker([queue], connection=redis_conn)
+    worker = SimpleWorker([queue], connection=redis_conn)
 
     print(f"🔧 RQ Worker started in background thread, listening on queue 'entrain'...")
-    worker.work()
+    # SimpleWorker doesn't use signal handlers, safe for threads
+    worker.work(logging_level='INFO')
 
 
 @asynccontextmanager
