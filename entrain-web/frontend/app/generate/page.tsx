@@ -18,7 +18,7 @@ export default async function GeneratePage() {
       <div className="fixed inset-0 bg-gradient-to-br from-purple-50/50 via-background to-indigo-50/30 pointer-events-none" />
 
       <div className="relative z-10">
-        <Header credits={session.user.credits} />
+        <Header credits={session.user.credits} isAdmin={session.user.isAdmin} />
 
         <main className="container mx-auto px-4 py-8">
           {/* Page heading */}
@@ -39,6 +39,7 @@ export default async function GeneratePage() {
               <GeneratorForm
                 userEmail={session.user.email!}
                 credits={session.user.credits}
+                isAdmin={session.user.isAdmin}
               />
             </CardContent>
           </Card>

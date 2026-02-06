@@ -12,7 +12,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header credits={session.user.credits} />
+      <Header credits={session.user.credits} isAdmin={session.user.isAdmin} />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">

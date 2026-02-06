@@ -43,8 +43,9 @@ export function DashboardClient({ userEmail }: DashboardClientProps) {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
+      <div className="flex flex-col items-center justify-center py-12 gap-3">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">Loading your tracks...</p>
       </div>
     );
   }

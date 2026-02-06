@@ -21,9 +21,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // Fetch credits from database
         const dbUser = await prisma.user.findUnique({
           where: { id: token.sub },
-          select: { credits: true },
+          select: { credits: true, email: true },
         });
         session.user.credits = dbUser?.credits ?? 0;
+        session.user.isAdmin = dbUser?.email === "jlschumann@gmail.com";
       }
       return session;
     },
@@ -59,6 +60,7 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       credits: number;
+      isAdmin: boolean;
     };
   }
 }

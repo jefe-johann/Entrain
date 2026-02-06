@@ -65,6 +65,7 @@ type FormValues = z.infer<typeof formSchema>;
 interface GeneratorFormProps {
   userEmail: string;
   credits: number;
+  isAdmin?: boolean;
 }
 
 function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
@@ -76,7 +77,7 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
   );
 }
 
-export function GeneratorForm({ userEmail, credits }: GeneratorFormProps) {
+export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -105,7 +106,7 @@ export function GeneratorForm({ userEmail, credits }: GeneratorFormProps) {
       .map((line) => line.trim())
       .filter((line) => line.length > 0).length;
     const creditsNeeded = Math.max(1, Math.ceil((affirmationCount * values.repetitions) / AFFIRMATIONS_PER_CREDIT));
-    if (credits < creditsNeeded) {
+    if (!isAdmin && credits < creditsNeeded) {
       toast.error(`Insufficient credits. This job requires ${creditsNeeded} credit${creditsNeeded !== 1 ? "s" : ""} but you have ${credits}.`);
       return;
     }
@@ -435,7 +436,7 @@ My life is filled with joy and purpose`}
       <div className="border-t border-border/60 pt-6">
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Credits remaining: <span className="font-medium text-foreground">{credits}</span>
+            Credits remaining: <span className="font-medium text-foreground">{isAdmin ? "∞" : credits}</span>
           </p>
           {(() => {
             const affirmationsText = form.watch("affirmations");
@@ -450,7 +451,7 @@ My life is filled with joy and purpose`}
               <Button
                 type="submit"
                 size="lg"
-                disabled={isSubmitting || credits < creditsRequired}
+                disabled={isSubmitting || (!isAdmin && credits < creditsRequired)}
                 className="shadow-md shadow-purple-500/20 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
               >
                 {isSubmitting ? "Creating..." : `Generate Track (${creditsRequired} credit${creditsRequired !== 1 ? "s" : ""})`}
