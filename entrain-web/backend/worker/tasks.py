@@ -58,6 +58,8 @@ def generate_meditation_task(job_id: str):
     Args:
         job_id: Database job ID
     """
+    import tempfile
+
     db = get_db_session()
     storage = StorageService()
 
@@ -80,7 +82,15 @@ def generate_meditation_task(job_id: str):
 
         # Determine output path
         output_filename = f"meditation-{job_id}.flac"
-        output_path = storage.get_file_path(job_id, output_filename)
+
+        # For R2 storage, generate in temp file then upload
+        if storage.storage_type == "r2":
+            # Create temp file for generation
+            temp_dir = tempfile.gettempdir()
+            local_output_path = os.path.join(temp_dir, output_filename)
+        else:
+            # Local storage path
+            local_output_path = storage.get_file_path(job_id, output_filename)
 
         # Create progress callback
         def progress_callback(progress: int, message: str):
@@ -89,10 +99,26 @@ def generate_meditation_task(job_id: str):
         # Run generation
         result = generate_meditation(
             config=job.config,
-            output_path=output_path,
+            output_path=local_output_path,
             elevenlabs_api_key=elevenlabs_api_key,
             progress_callback=progress_callback,
         )
+
+        # If using R2, upload the file
+        if storage.storage_type == "r2":
+            update_job_progress(job_id, 95, "Uploading to cloud storage...")
+
+            remote_path = storage.get_file_path(job_id, output_filename)
+            upload_success = storage.upload_file(local_output_path, remote_path)
+
+            if not upload_success:
+                raise Exception("Failed to upload file to R2")
+
+            # Clean up local temp file
+            os.unlink(local_output_path)
+
+            # Update file path to remote path
+            result['file_path'] = remote_path
 
         # Update job as completed
         job.status = "completed"

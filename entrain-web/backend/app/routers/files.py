@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from typing import Optional
 import os
@@ -53,6 +53,14 @@ def download_file(
     duration = config.get("duration_minutes", 40)
     filename = f"meditation-{voice}-{duration}min.flac"
 
+    # For R2 storage, redirect to presigned URL
+    if storage_service.storage_type == "r2":
+        download_url = storage_service.get_download_path(job.file_path)
+        if not download_url:
+            raise HTTPException(status_code=500, detail="Failed to generate download URL")
+        return RedirectResponse(url=download_url)
+
+    # For local storage, serve file directly
     return FileResponse(
         path=job.file_path,
         media_type="audio/flac",
