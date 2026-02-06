@@ -104,4 +104,48 @@ Full-stack web interface for audio generation with user management and async job
 ### Infrastructure
 - **Docker Compose**: PostgreSQL + Redis (required for dev)
 - **Ports**: Frontend :3000, Backend :8000, Postgres :5432, Redis :6379
-- **Queue**: RQ for async job processing (requires separate worker process)
+- **Queue**: RQ for async job processing (worker runs in-process with FastAPI on production)
+
+---
+
+## Production Deployment
+
+### Services & URLs
+- **Frontend**: Vercel - `https://www.entrain.app`
+- **Backend API**: Render Web Service - `https://entrain-backend-api.onrender.com`
+- **Database**: Render Postgres (ohio region)
+- **Cache/Queue**: Render Redis (ohio region)
+- **File Storage**: Cloudflare R2 bucket `entrain-audio-files`
+- **Domain**: Porkbun.com
+
+### Key Files
+- **Architecture guide**: `entrain-web/docs/architecture-explained.md` - Read this first for deployment overview
+- **Deployment guide**: `entrain-web/deployment-guide.md` - Step-by-step setup instructions
+- **Auth config**: `entrain-web/frontend/auth.config.ts` - Lightweight auth for middleware
+- **Auth full**: `entrain-web/frontend/auth.ts` - Full auth with Prisma adapter
+
+### Environment Variables
+**Vercel (frontend):**
+- `DATABASE_URL` - External Postgres URL (for Auth.js sessions)
+- `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`
+- `NEXT_PUBLIC_API_URL` - Render backend URL
+- `NEXTAUTH_URL` - Production domain
+
+**Render (backend):**
+- `DATABASE_URL`, `REDIS_URL` - Internal URLs (same network)
+- `FRONTEND_URL` - Vercel domain (for CORS)
+- `ELEVENLABS_API_KEY`
+- `STORAGE_TYPE=r2`, `R2_*` credentials
+
+### Common Tasks
+**Deploy frontend**: Push to GitHub → Vercel auto-deploys
+**Deploy backend**: Push to GitHub → Render Manual Deploy
+**Database migration**: `DATABASE_URL="<external-url>" npx prisma db push` (from `frontend/`)
+**Check logs**: Vercel/Render dashboards → Logs tab
+**Update env vars**: Dashboard → Settings/Environment → Save → Redeploy
+
+### Notes
+- Backend + worker run in same process (see `backend/app/main.py`)
+- Free tier: 15min spin-down, 30-60s cold start
+- Domain DNS: A record + CNAME in Porkbun pointing to Vercel
+- OAuth: Callback URI must match production domain in Google Console
