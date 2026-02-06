@@ -36,10 +36,12 @@ def create_job(
     """Create a new generation job."""
     user = get_user_by_email(email, db)
 
-    # Check and deduct credits (skip in dev mode)
+    # Check and deduct credits (skip in dev mode or for admin users)
     settings = get_settings()
     credits_needed = job_data.config.credits_required()
-    if not settings.dev_unlimited_credits:
+    is_admin = user.email == "jlschumann@gmail.com"
+
+    if not settings.dev_unlimited_credits and not is_admin:
         if user.credits < credits_needed:
             raise HTTPException(
                 status_code=402,
