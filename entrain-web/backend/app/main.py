@@ -161,15 +161,30 @@ def get_worker_status():
     """Diagnostic endpoint to check RQ worker health."""
     thread_alive = worker_thread.is_alive() if worker_thread else False
 
-    # Check Redis connectivity
+    # Check Redis connectivity and RQ registries
     redis_ok = False
     queue_size = None
+    failed_count = None
+    failed_jobs = []
     try:
         from .services import get_queue_service
+        from rq.job import Job as RQJob
         qs = get_queue_service()
         qs.redis.ping()
         redis_ok = True
         queue_size = qs.queue.count
+        # Check failed job registry
+        failed_registry = qs.queue.failed_job_registry
+        failed_count = len(failed_registry)
+        for job_id in failed_registry.get_job_ids()[:5]:
+            try:
+                rq_job = RQJob.fetch(job_id, connection=qs.redis)
+                failed_jobs.append({
+                    "id": job_id,
+                    "exc": str(rq_job.exc_info)[:500] if rq_job.exc_info else None,
+                })
+            except Exception:
+                failed_jobs.append({"id": job_id, "exc": "could not fetch"})
     except Exception as e:
         redis_error = str(e)
 
@@ -182,4 +197,6 @@ def get_worker_status():
         "last_error_at": worker_status["last_error_at"],
         "redis_connected": redis_ok,
         "queue_size": queue_size,
+        "failed_count": failed_count,
+        "failed_jobs": failed_jobs,
     }
