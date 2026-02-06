@@ -1,6 +1,12 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Header } from "@/components/Header";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Affirmation Tips - Entrain",
+  description: "Learn how to write effective affirmations for your meditation tracks",
+};
 
 export default async function ConfigNotesPage() {
   const session = await auth();
@@ -13,7 +19,7 @@ export default async function ConfigNotesPage() {
     <div className="min-h-screen bg-background">
       <Header credits={session.user.credits} isAdmin={session.user.isAdmin} />
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main id="main-content" className="container mx-auto px-4 py-8 max-w-4xl">
         <h1 className="text-3xl font-bold mb-6">Affirmation Tips</h1>
 
         <div className="prose prose-slate dark:prose-invert max-w-none">
