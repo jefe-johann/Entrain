@@ -45,16 +45,24 @@ def run_rq_worker():
     # macOS: Disable fork safety check
     os.environ.setdefault("OBJC_DISABLE_INITIALIZE_FORK_SAFETY", "YES")
 
+    redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+    redis_conn = None
+
     while True:
         try:
-            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+            # Close previous connection if it exists
+            if redis_conn:
+                try:
+                    redis_conn.close()
+                except Exception:
+                    pass
+
             redis_conn = Redis.from_url(redis_url)
 
             # Verify Redis connection
             redis_conn.ping()
             logger.info("Redis connection verified")
 
-            # Create queue and worker (use SimpleWorker for thread compatibility)
             queue = Queue("entrain", connection=redis_conn)
             worker = ThreadSafeWorker([queue], connection=redis_conn)
 
@@ -62,7 +70,6 @@ def run_rq_worker():
             worker_status["started_at"] = time.time()
             logger.info("RQ Worker started in background thread, listening on queue 'entrain'")
 
-            # SimpleWorker doesn't use signal handlers, safe for threads
             worker.work(logging_level='INFO')
 
             # If work() returns normally, the worker stopped
