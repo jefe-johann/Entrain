@@ -29,7 +29,7 @@ interface JobConfig {
 interface Job {
   id: string;
   user_id: string;
-  status: "pending" | "processing" | "completed" | "failed";
+  status: "pending" | "processing" | "completed" | "failed" | "archived";
   progress: number;
   progress_message: string | null;
   error_message: string | null;
@@ -39,6 +39,7 @@ interface Job {
   created_at: string;
   updated_at: string;
   completed_at: string | null;
+  archived_at: string | null;
 }
 
 interface JobStatus {
@@ -47,6 +48,12 @@ interface JobStatus {
   progress: number;
   progress_message: string | null;
   error_message: string | null;
+}
+
+interface StorageInfo {
+  used_bytes: number;
+  limit_bytes: number;
+  used_percentage: number;
 }
 
 interface User {
@@ -137,6 +144,18 @@ class ApiClient {
     await this.fetch(`/api/jobs/${jobId}`, { method: "DELETE" });
   }
 
+  async getStorageInfo(): Promise<StorageInfo> {
+    return this.fetch<StorageInfo>("/api/jobs/storage");
+  }
+
+  async archiveJob(jobId: string): Promise<Job> {
+    return this.fetch<Job>(`/api/jobs/${jobId}/archive`, { method: "POST" });
+  }
+
+  async regenerateJob(jobId: string): Promise<Job> {
+    return this.fetch<Job>(`/api/jobs/${jobId}/regenerate`, { method: "POST" });
+  }
+
   // File endpoints
   getDownloadUrl(jobId: string): string {
     return `${this.baseUrl}/api/files/${jobId}`;
@@ -144,4 +163,4 @@ class ApiClient {
 }
 
 export const api = new ApiClient();
-export type { Job, JobConfig, JobStatus, User };
+export type { Job, JobConfig, JobStatus, StorageInfo, User };

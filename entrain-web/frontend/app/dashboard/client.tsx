@@ -6,7 +6,8 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JobStatusCard } from "@/components/JobStatusCard";
-import { api, Job } from "@/lib/api";
+import { StorageUsageBar } from "@/components/StorageUsageBar";
+import { api, Job, StorageInfo } from "@/lib/api";
 
 interface DashboardClientProps {
   userEmail: string;
@@ -17,14 +18,19 @@ export function DashboardClient({ userEmail }: DashboardClientProps) {
   const highlightJobId = searchParams.get("job");
 
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchJobs = async () => {
+  const fetchData = async () => {
     try {
       api.setUserEmail(userEmail);
-      const fetchedJobs = await api.listJobs();
+      const [fetchedJobs, fetchedStorage] = await Promise.all([
+        api.listJobs(),
+        api.getStorageInfo(),
+      ]);
       setJobs(fetchedJobs);
+      setStorageInfo(fetchedStorage);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load jobs");
@@ -33,12 +39,33 @@ export function DashboardClient({ userEmail }: DashboardClientProps) {
     }
   };
 
+  const refreshStorage = async () => {
+    try {
+      api.setUserEmail(userEmail);
+      const storage = await api.getStorageInfo();
+      setStorageInfo(storage);
+    } catch {
+      // Silently fail - storage bar will just be stale
+    }
+  };
+
   useEffect(() => {
-    fetchJobs();
+    fetchData();
   }, [userEmail]);
 
   const handleDelete = (jobId: string) => {
     setJobs((prev) => prev.filter((j) => j.id !== jobId));
+    refreshStorage();
+  };
+
+  const handleArchive = (archivedJob: Job) => {
+    setJobs((prev) => prev.map((j) => (j.id === archivedJob.id ? archivedJob : j)));
+    refreshStorage();
+  };
+
+  const handleRegenerate = (newJob: Job) => {
+    setJobs((prev) => [newJob, ...prev]);
+    refreshStorage();
   };
 
   if (loading) {
@@ -54,7 +81,7 @@ export function DashboardClient({ userEmail }: DashboardClientProps) {
     return (
       <div className="text-center py-12">
         <p className="text-destructive mb-4">{error}</p>
-        <Button onClick={fetchJobs}>Try Again</Button>
+        <Button onClick={fetchData}>Try Again</Button>
       </div>
     );
   }
@@ -79,6 +106,7 @@ export function DashboardClient({ userEmail }: DashboardClientProps) {
 
   return (
     <div className="space-y-4">
+      {storageInfo && <StorageUsageBar storageInfo={storageInfo} />}
       {sortedJobs.map((job) => (
         <div
           key={job.id}
@@ -88,6 +116,8 @@ export function DashboardClient({ userEmail }: DashboardClientProps) {
             job={job}
             userEmail={userEmail}
             onDelete={() => handleDelete(job.id)}
+            onArchive={handleArchive}
+            onRegenerate={handleRegenerate}
           />
         </div>
       ))}

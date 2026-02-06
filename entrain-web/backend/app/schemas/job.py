@@ -100,6 +100,7 @@ class JobResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     completed_at: Optional[datetime]
+    archived_at: Optional[datetime]
 
     class Config:
         from_attributes = True

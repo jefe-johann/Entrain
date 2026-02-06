@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     # Security
     secret_key: str = "change_me_in_production"
 
+    # Storage limits
+    user_storage_limit_bytes: int = 250 * 1024 * 1024  # 250 MB
+    file_retention_days: int = 7
+
     # Dev mode
     dev_unlimited_credits: bool = False
 

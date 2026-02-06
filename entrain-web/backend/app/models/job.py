@@ -17,7 +17,7 @@ class Job(Base):
     user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     rq_job_id = Column(String, nullable=True, index=True)
 
-    # Status: pending, processing, completed, failed
+    # Status: pending, processing, completed, failed, archived
     status = Column(String, default="pending", nullable=False)
     progress = Column(Integer, default=0)  # 0-100
     progress_message = Column(String, nullable=True)
@@ -33,6 +33,7 @@ class Job(Base):
     created_at = Column(DateTime(timezone=True), default=utc_now)
     updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
     completed_at = Column(DateTime(timezone=True), nullable=True)
+    archived_at = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships
     user = relationship("User", back_populates="jobs")

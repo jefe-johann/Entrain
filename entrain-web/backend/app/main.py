@@ -94,6 +94,18 @@ async def lifespan(app: FastAPI):
     # Startup: Create database tables
     Base.metadata.create_all(bind=engine)
 
+    # Run cleanup for expired jobs (catches anything missed during Render spin-down)
+    try:
+        from .database import SessionLocal
+        from .services import cleanup_expired_jobs
+        db = SessionLocal()
+        cleaned = cleanup_expired_jobs(db)
+        if cleaned:
+            logger.info(f"Startup cleanup: processed {cleaned} expired jobs")
+        db.close()
+    except Exception as e:
+        logger.warning(f"Startup cleanup failed: {e}")
+
     # Start RQ worker in background thread
     worker_thread = threading.Thread(target=run_rq_worker, daemon=True)
     worker_thread.start()
