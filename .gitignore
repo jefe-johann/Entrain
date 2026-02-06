@@ -30,6 +30,9 @@ config-presets/config-riches.yaml
 # Claude
 CLAUDE.md
 
+# Documentation
+docs/
+
 # IDE
 .idea/
 .vscode/
@@ -39,3 +42,4 @@ CLAUDE.md
 # Node.js (for entrain-web)
 node_modules/
 .next/
+*.tsbuildinfo
