@@ -7,13 +7,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
   callbacks: {
-    async session({ session, user }) {
-      // Add user id and credits to session
-      if (session.user) {
-        session.user.id = user.id;
+    async jwt({ token, user }) {
+      // On sign-in, persist user id to the JWT
+      if (user) {
+        token.sub = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Add user id and credits to session from JWT token
+      if (session.user && token.sub) {
+        session.user.id = token.sub;
         // Fetch credits from database
         const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
+          where: { id: token.sub },
           select: { credits: true },
         });
         session.user.credits = dbUser?.credits ?? 0;
