@@ -181,7 +181,7 @@ def get_worker_status():
                 rq_job = RQJob.fetch(job_id, connection=qs.redis)
                 failed_jobs.append({
                     "id": job_id,
-                    "exc": str(rq_job.exc_info)[:500] if rq_job.exc_info else None,
+                    "exc": str(rq_job.exc_info)[:2000] if rq_job.exc_info else None,
                 })
             except Exception:
                 failed_jobs.append({"id": job_id, "exc": "could not fetch"})

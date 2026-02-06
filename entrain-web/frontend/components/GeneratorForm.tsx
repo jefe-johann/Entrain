@@ -49,7 +49,7 @@ const formSchema = z.object({
   title: z.string().max(100).optional(),
   affirmations: z.string().min(1, "Please enter at least one affirmation"),
   voice_id: z.string(),
-  duration_minutes: z.number().min(10).max(60),
+  duration_minutes: z.number().min(5).max(40),
   binaural_preset: z.enum(["delta", "theta", "alpha", "beta"]),
   affirmation_volume_db: z.number().min(-30).max(0),
   binaural_volume_db: z.number().min(-30).max(0),
@@ -276,13 +276,13 @@ My life is filled with joy and purpose`}
             <Slider
               value={[form.watch("duration_minutes")]}
               onValueChange={([value]) => form.setValue("duration_minutes", value)}
-              min={10}
-              max={60}
+              min={5}
+              max={40}
               step={5}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>10 min</span>
-              <span>60 min</span>
+              <span>5 min</span>
+              <span>40 min</span>
             </div>
           </div>
 
