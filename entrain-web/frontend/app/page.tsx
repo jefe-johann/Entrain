@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Waves, MessageSquareText, Mic, Headphones, PenLine, Sparkles, Download } from "lucide-react";
+import { Waves, MessageSquareText, Mic, Headphones, PenLine, Sparkles, Download, ChevronDown } from "lucide-react";
 
 export default async function LandingPage() {
   const session = await auth();
@@ -27,7 +27,7 @@ export default async function LandingPage() {
 
       <div className="relative z-10">
         {/* Hero Section */}
-        <section className="pt-20 pb-16 px-4">
+        <section className="pt-20 pb-8 px-4">
           <div className="container mx-auto max-w-5xl text-center">
             {/* Logo with glow */}
             <div className="flex justify-center mb-8 animate-fade-in-up">
@@ -74,8 +74,13 @@ export default async function LandingPage() {
                 </Button>
               </form>
               <p className="text-sm text-muted-foreground mt-3">
-                Sign in with Google &middot; 1 free credit included
+                Sign in with Google
               </p>
+            </div>
+
+            {/* Scroll Indicator */}
+            <div className="mt-12 flex justify-center">
+              <ChevronDown className="w-8 h-8 text-muted-foreground/40" />
             </div>
           </div>
         </section>
@@ -215,7 +220,7 @@ export default async function LandingPage() {
                     Sign in with Google
                   </Button>
                   <p className="text-sm text-purple-200 mt-3">
-                    1 free credit to get started &middot; No credit card required
+                    No credit card required
                   </p>
                 </form>
               </CardContent>
