@@ -18,7 +18,7 @@ settings = get_settings()
 logger = logging.getLogger(__name__)
 
 # Testing Blueprint auto-deploy
-logger.info("Blueprint auto-deploy test - v1.0.2")
+logger.info("Blueprint auto-deploy test - v1.0.3")
 
 
 class ThreadSafeWorker(SimpleWorker):
