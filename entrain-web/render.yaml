@@ -11,34 +11,24 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
-    autoDeployTrigger: commit  # Auto-deploy on push to main
+    autoDeployTrigger: commit
 
     envVars:
-      # Database (references existing Postgres)
       - key: DATABASE_URL
-        fromDatabase:
-          name: entrain-postgres
-          property: connectionString
+        sync: false
 
-      # Redis (references existing Redis)
       - key: REDIS_URL
-        fromService:
-          name: entrain-redis
-          type: redis
-          property: connectionString
+        sync: false
 
-      # Frontend URL (public)
       - key: FRONTEND_URL
         value: https://www.entrain.app
 
-      # Storage
       - key: STORAGE_TYPE
         value: r2
 
       - key: R2_BUCKET_NAME
         value: entrain-audio-files
 
-      # Secrets (sync: false - set manually in dashboard)
       - key: ELEVENLABS_API_KEY
         sync: false
 
@@ -62,5 +52,3 @@ services:
 
       - key: STRIPE_PRICE_MAP
         sync: false
-
-databases: []  # Don't create new DBs - we're referencing existing ones
