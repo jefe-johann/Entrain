@@ -254,6 +254,297 @@ CNAME   www.entrain.app   05e26a2f2e6cdd1d.vercel-dns-017.com.       Points www 
 
 ---
 
+## Database Layer: Prisma ORM
+
+### What is Prisma?
+Prisma is an **ORM (Object-Relational Mapping)** tool. Think of it as a **translator between your JavaScript/TypeScript code and your PostgreSQL database**. Instead of writing raw SQL queries, you write JavaScript that Prisma converts to SQL automatically.
+
+**Without Prisma (raw SQL):**
+```sql
+SELECT * FROM users WHERE email = 'jeff@example.com';
+INSERT INTO jobs (user_id, status, config) VALUES (123, 'pending', '{}');
+```
+
+**With Prisma (JavaScript):**
+```typescript
+const user = await prisma.user.findUnique({ where: { email: 'jeff@example.com' } });
+const job = await prisma.job.create({ data: { userId: 123, status: 'pending', config: {} } });
+```
+
+### Where does Prisma live?
+**Frontend only** (`/entrain-web/frontend/`). Your backend (FastAPI/Python) uses SQLAlchemy instead, but Prisma is used by:
+- **Auth.js** (for managing user sessions and accounts)
+- **Next.js API routes** (if you add any custom database queries in the frontend)
+- **Database migrations** (creating/updating tables)
+- **Prisma Studio** (database GUI tool)
+
+### The Prisma Schema File
+Located at: `/entrain-web/frontend/prisma/schema.prisma`
+
+This file defines your **database structure** in a human-readable format:
+
+```prisma
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  credits       Int       @default(1)
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+
+  jobs          Job[]
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Job {
+  id         String   @id @default(cuid())
+  userId     String
+  status     String   // "pending", "processing", "completed", "failed"
+  config     Json
+  filePath   String?
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+}
+```
+
+**What this means:**
+- Each `model` becomes a **table** in PostgreSQL
+- Each field becomes a **column**
+- `@relation` creates **foreign keys** (links between tables)
+- When you change this file and run `npx prisma db push`, Prisma updates your database structure
+
+### How Prisma Fits in the Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│  Next.js Frontend (TypeScript)                  │
+│  ┌───────────────────────────────────────────┐  │
+│  │  Auth.js (authentication)                 │  │
+│  │  "Need to check if user exists..."        │  │
+│  │                                            │  │
+│  │  ↓                                         │  │
+│  │                                            │  │
+│  │  Prisma Client (Auto-generated)           │  │
+│  │  prisma.user.findUnique({ ... })          │  │
+│  │                                            │  │
+│  │  ↓ (Prisma converts to SQL)               │  │
+│  │                                            │  │
+│  │  SELECT * FROM users WHERE email = '...'  │  │
+│  └───────────────────┬───────────────────────┘  │
+└────────────────────────┼────────────────────────┘
+                         │
+                         ↓ (SQL query sent)
+         ┌───────────────────────────────┐
+         │  PostgreSQL Database (Render)  │
+         │  • users table                │
+         │  • jobs table                 │
+         │  • sessions table             │
+         │  • accounts table             │
+         └───────────────────────────────┘
+```
+
+### Prisma Client: The Magic Auto-Generated Code
+When you run `npx prisma generate`, Prisma reads your schema file and creates a **type-safe database client** at `node_modules/.prisma/client`. This client knows about all your tables, columns, and relationships.
+
+**Example queries you can make:**
+```typescript
+// Find a user by email
+const user = await prisma.user.findUnique({
+  where: { email: 'jeff@example.com' }
+});
+
+// Create a new job
+const job = await prisma.job.create({
+  data: {
+    userId: user.id,
+    status: 'pending',
+    config: { duration: 40, voice: 'Rachel' }
+  }
+});
+
+// Get all jobs for a user (with relationship)
+const userWithJobs = await prisma.user.findUnique({
+  where: { id: '123' },
+  include: { jobs: true }  // Include related jobs
+});
+
+// Update job status
+await prisma.job.update({
+  where: { id: 'job_abc' },
+  data: { status: 'completed', filePath: 'audio.flac' }
+});
+```
+
+**TypeScript magic:** Prisma Client is fully typed! Your editor will autocomplete field names and catch typos before you run the code.
+
+### Common Prisma Commands
+
+**1. Update database structure (after changing schema):**
+```bash
+cd entrain-web/frontend
+DATABASE_URL="postgresql://..." npx prisma db push
+```
+This creates/modifies tables to match your schema. Use this during development.
+
+**2. Generate Prisma Client (after changing schema):**
+```bash
+npx prisma generate
+```
+Rebuilds the type-safe client. Usually runs automatically after `db push`.
+
+**3. Open Prisma Studio (database GUI):**
+```bash
+DATABASE_URL="postgresql://..." npx prisma studio
+```
+Opens `localhost:5555` in your browser. You can:
+- Browse all tables
+- Add/edit/delete records manually
+- Super helpful for debugging!
+
+**4. Reset database (DANGER: deletes all data):**
+```bash
+npx prisma db push --force-reset
+```
+Only use in development when you want a clean slate.
+
+### Why Use Prisma?
+
+**For beginners:**
+- ✅ **No SQL knowledge required** - Write JavaScript instead
+- ✅ **Type safety** - Editor catches mistakes before runtime
+- ✅ **Auto-completion** - Your editor suggests field names
+- ✅ **Relationships made easy** - No complex JOIN queries
+- ✅ **Database GUI** - Prisma Studio is easier than psql
+
+**Alternative (raw SQL):**
+```typescript
+// Without Prisma - easy to make mistakes!
+const result = await db.query(
+  'SELECT * FROM users WHERE emal = $1',  // Typo: "emal" instead of "email"
+  ['jeff@example.com']
+);
+const user = result.rows[0];  // No type checking!
+```
+
+**With Prisma:**
+```typescript
+// Prisma - TypeScript will error if you typo "email"
+const user = await prisma.user.findUnique({
+  where: { email: 'jeff@example.com' }
+});
+// ↑ user is fully typed - editor knows it has .id, .email, .name, etc.
+```
+
+### Where Prisma is Used in Entrain
+
+**1. Auth.js (user authentication):**
+- Checks if user exists in database
+- Creates new users on first Google sign-in
+- Stores OAuth tokens in `accounts` table
+- Manages login sessions in `sessions` table
+
+**2. Database migrations:**
+- When you modify `schema.prisma`, Prisma updates PostgreSQL
+- Keeps your database structure in sync with your code
+
+**3. Manual database access:**
+- Prisma Studio for viewing/editing data during development
+- Troubleshooting user accounts or job records
+
+### Prisma vs. SQLAlchemy (Backend)
+You might notice the **backend uses SQLAlchemy** (Python ORM) instead of Prisma. Why?
+
+- **Frontend**: Next.js (JavaScript/TypeScript) → uses Prisma
+- **Backend**: FastAPI (Python) → uses SQLAlchemy
+
+Both are ORMs, just for different languages. They both talk to the **same PostgreSQL database** but from different parts of your app.
+
+**Key point:** Schema changes should be made in **Prisma schema** (since that's your source of truth), then manually updated in SQLAlchemy models to match.
+
+### Real-World Example: User Sign-In Flow
+
+```typescript
+// This happens in Auth.js when user signs in with Google:
+
+// 1. Check if user exists
+const existingUser = await prisma.user.findUnique({
+  where: { email: googleProfile.email }
+});
+
+if (!existingUser) {
+  // 2. Create new user if first time signing in
+  const newUser = await prisma.user.create({
+    data: {
+      email: googleProfile.email,
+      name: googleProfile.name,
+      image: googleProfile.picture,
+      credits: 1  // Give 1 free credit
+    }
+  });
+
+  // 3. Link Google account
+  await prisma.account.create({
+    data: {
+      userId: newUser.id,
+      provider: 'google',
+      providerAccountId: googleProfile.id,
+      accessToken: googleToken.accessToken
+    }
+  });
+}
+
+// 4. Create login session
+await prisma.session.create({
+  data: {
+    userId: existingUser.id,
+    sessionToken: randomToken,
+    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)  // 30 days
+  }
+});
+```
+
+Behind the scenes, Prisma converts this to SQL:
+```sql
+SELECT * FROM users WHERE email = 'jeff@example.com';
+INSERT INTO users (id, email, name, image, credits) VALUES (...);
+INSERT INTO accounts (user_id, provider, provider_account_id, access_token) VALUES (...);
+INSERT INTO sessions (user_id, session_token, expires) VALUES (...);
+```
+
+But you never have to write those SQL queries yourself!
+
+### Quick Reference: Prisma Files
+
+| File Path | What It Does |
+|-----------|--------------|
+| `frontend/prisma/schema.prisma` | Database structure definition (source of truth) |
+| `node_modules/.prisma/client/` | Auto-generated type-safe client (don't edit manually) |
+| `frontend/lib/prisma.ts` | Prisma Client singleton (reused across app) |
+
+### Troubleshooting Prisma Issues
+
+**"Prisma Client is out of sync with schema"**
+- **Solution**: Run `npx prisma generate`
+
+**"Can't connect to database"**
+- **Check**: `DATABASE_URL` environment variable is set
+- **Check**: Using External URL (with `.ohio-postgres.render.com`) for local development
+- **Check**: Database is running in Render dashboard
+
+**"Migration failed"**
+- **Cause**: Schema change conflicts with existing data
+- **Solution**: In development, use `npx prisma db push --force-reset` (WARNING: deletes all data)
+- **Production**: Use Prisma Migrate instead of `db push`
+
+**"Type errors after schema change"**
+- **Solution**: Restart your TypeScript server (VS Code: Cmd+Shift+P → "Restart TS Server")
+- **Solution**: Delete `node_modules/.prisma` and run `npx prisma generate` again
+
+---
+
 ## How a User Request Flows Through the System
 
 ### Scenario 1: User Generates Audio
