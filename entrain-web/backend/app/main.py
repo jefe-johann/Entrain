@@ -17,9 +17,6 @@ from .routers import users_router, jobs_router, files_router, payments_router
 settings = get_settings()
 logger = logging.getLogger(__name__)
 
-# Testing Blueprint auto-deploy
-logger.info("Blueprint auto-deploy test - v1.0.3")
-
 
 class ThreadSafeWorker(SimpleWorker):
     """SimpleWorker that can run in a background thread.
