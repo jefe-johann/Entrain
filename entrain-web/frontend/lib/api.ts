@@ -4,6 +4,12 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+interface Voice {
+  id: string;
+  name: string;
+  preview_url: string | null;
+}
+
 interface JobConfig {
   affirmations: string[];
   title?: string;
@@ -164,6 +170,11 @@ class ApiClient {
     });
   }
 
+  // Voice endpoints
+  async getVoices(): Promise<Voice[]> {
+    return this.fetch<Voice[]>("/api/voices");
+  }
+
   // File endpoints
   getDownloadUrl(jobId: string): string {
     return `${this.baseUrl}/api/files/${jobId}`;
@@ -171,4 +182,4 @@ class ApiClient {
 }
 
 export const api = new ApiClient();
-export type { Job, JobConfig, JobStatus, StorageInfo, User };
+export type { Job, JobConfig, JobStatus, StorageInfo, User, Voice };

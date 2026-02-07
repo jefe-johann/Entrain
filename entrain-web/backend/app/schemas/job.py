@@ -39,7 +39,7 @@ class JobConfig(BaseModel):
 
     # Basic settings
     title: Optional[str] = Field(default=None, max_length=100)
-    voice_id: str = "Rachel"
+    voice_id: str = "Clara"
     duration_minutes: int = Field(default=40, ge=5, le=40)
     binaural_preset: Optional[BinauralPreset] = BinauralPreset.THETA
     binaural_frequency_hz: Optional[float] = Field(default=None, ge=0.5, le=30)

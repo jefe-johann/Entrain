@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ChevronDown, Music, Mic2, Settings2, Repeat } from "lucide-react";
+import { ChevronDown, Music, Mic2, Settings2, Repeat, Play, Square } from "lucide-react";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -27,14 +27,17 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { api, JobConfig } from "@/lib/api";
+import { api, JobConfig, Voice } from "@/lib/api";
 
-const VOICES = [
-  { id: "Emma", name: "Emma", description: "Australian accent" },
-  { id: "Rachel", name: "Rachel", description: "Default voice" },
-  { id: "Maria-Mysh", name: "Maria-Mysh", description: "Foreign accent" },
-  { id: "Brittney", name: "Brittney", description: "US, calm/meditative" },
-  { id: "Brian", name: "Brian", description: "US, deep/resonant" },
+const FALLBACK_VOICES: Voice[] = [
+  { id: "Clara", name: "Clara", preview_url: null },
+  { id: "Anne", name: "Anne", preview_url: null },
+  { id: "Emma", name: "Emma", preview_url: null },
+  { id: "Sadie", name: "Sadie", preview_url: null },
+  { id: "Brian", name: "Brian", preview_url: null },
+  { id: "Charlie", name: "Charlie", preview_url: null },
+  { id: "Jon", name: "Jon", preview_url: null },
+  { id: "Clancy", name: "Clancy", preview_url: null },
 ];
 
 const BINAURAL_PRESETS = [
@@ -82,20 +85,52 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [voices, setVoices] = useState<Voice[]>(FALLBACK_VOICES);
+  const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    api.getVoices().then(setVoices).catch(() => setVoices(FALLBACK_VOICES));
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const audio = new Audio();
+    audioRef.current = audio;
+    const handleEnded = () => setPlayingVoiceId(null);
+    audio.addEventListener("ended", handleEnded);
+    return () => {
+      audio.removeEventListener("ended", handleEnded);
+      audio.pause();
+    };
+  }, []);
+
+  const togglePreview = (voiceId: string, previewUrl: string | null) => {
+    if (!audioRef.current || !previewUrl) return;
+    if (playingVoiceId === voiceId) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setPlayingVoiceId(null);
+    } else {
+      audioRef.current.src = previewUrl;
+      audioRef.current.play();
+      setPlayingVoiceId(voiceId);
+    }
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       affirmations: "",
-      voice_id: "Rachel",
+      voice_id: "Clara",
       duration_minutes: 40,
       binaural_preset: "theta",
       affirmation_volume_db: -15,
       binaural_volume_db: -12,
       voice_stability: 0.8,
       voice_similarity: 0.75,
-      lowpass_enabled: true,
+      lowpass_enabled: false,
       lowpass_cutoff: 3750,
       repetitions: 1,
     },
@@ -240,21 +275,40 @@ My life is filled with joy and purpose`}
           {/* Voice */}
           <div className="space-y-2">
             <Label htmlFor="voice">Voice</Label>
-            <Select
-              value={form.watch("voice_id")}
-              onValueChange={(value) => form.setValue("voice_id", value)}
-            >
-              <SelectTrigger className="bg-white/60">
-                <SelectValue placeholder="Select a voice" />
-              </SelectTrigger>
-              <SelectContent>
-                {VOICES.map((voice) => (
-                  <SelectItem key={voice.id} value={voice.id}>
-                    {voice.name} - {voice.description}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select
+                value={form.watch("voice_id")}
+                onValueChange={(value) => form.setValue("voice_id", value)}
+              >
+                <SelectTrigger className="bg-white/60 flex-1">
+                  <SelectValue placeholder="Select a voice" />
+                </SelectTrigger>
+                <SelectContent>
+                  {voices.map((voice) => (
+                    <SelectItem key={voice.id} value={voice.id}>
+                      {voice.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  const selected = voices.find(v => v.id === form.watch("voice_id"));
+                  if (selected) togglePreview(selected.id, selected.preview_url);
+                }}
+                disabled={!voices.find(v => v.id === form.watch("voice_id"))?.preview_url}
+                title={playingVoiceId === form.watch("voice_id") ? "Stop preview" : "Preview voice"}
+              >
+                {playingVoiceId === form.watch("voice_id") ? (
+                  <Square className="w-4 h-4" />
+                ) : (
+                  <Play className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Binaural Preset */}

@@ -20,11 +20,14 @@ from typing import Callable, Optional
 
 # Voice ID mappings (same as original config)
 VOICES = {
+    "Clara": "Qggl4b0xRMiqOwhPtVWT",
+    "Anne": "flHkNRp1BlvT73UL6gyz",
     "Emma": "56bWURjYFHyYyVf490Dp",
-    "Rachel": "21m00Tcm4TlvDq8ikWAM",
-    "Maria-Mysh": "vZzlAds9NzvLsFSWp0qk",
-    "Brittney": "pjcYQlDFKMbcOUp6F5GD",
+    "Sadie": "bD9maNcCuQQS75DGuteM",
     "Brian": "nPczCjzI2devNBz1zQrb",
+    "Charlie": "IKne3meq5aSn9XLyUdCD",
+    "Jon": "Cz0K1kOv9tD8l0b5Qu53",
+    "Clancy": "FLpz0UhC9a7CIfUSBo6S",
 }
 
 # Default audio settings
