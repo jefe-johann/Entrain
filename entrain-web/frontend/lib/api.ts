@@ -156,6 +156,14 @@ class ApiClient {
     return this.fetch<Job>(`/api/jobs/${jobId}/regenerate`, { method: "POST" });
   }
 
+  // Payment endpoints
+  async createCheckoutSession(priceId: string): Promise<{ checkout_url: string }> {
+    return this.fetch<{ checkout_url: string }>("/api/payments/create-checkout-session", {
+      method: "POST",
+      body: JSON.stringify({ price_id: priceId }),
+    });
+  }
+
   // File endpoints
   getDownloadUrl(jobId: string): string {
     return `${this.baseUrl}/api/files/${jobId}`;

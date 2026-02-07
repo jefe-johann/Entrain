@@ -56,10 +56,13 @@ export function Header({ credits, isAdmin }: HeaderProps) {
             </Button>
           ))}
           <div className="ml-2 pl-3 border-l border-border/60 flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground bg-secondary/60 px-2.5 py-1 rounded-full">
+            <Link
+              href="/credits"
+              className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground bg-secondary/60 px-2.5 py-1 rounded-full hover:bg-secondary transition-colors"
+            >
               <Coins className="w-3.5 h-3.5 text-purple-500" />
               {isAdmin ? "∞" : credits}
-            </div>
+            </Link>
             <form action={handleSignOut}>
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                 Sign Out

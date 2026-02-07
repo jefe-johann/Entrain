@@ -12,7 +12,7 @@ from rq.timeouts import TimerDeathPenalty
 
 from .config import get_settings
 from .database import engine, Base
-from .routers import users_router, jobs_router, files_router
+from .routers import users_router, jobs_router, files_router, payments_router
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -144,6 +144,7 @@ app.add_middleware(
 app.include_router(users_router)
 app.include_router(jobs_router)
 app.include_router(files_router)
+app.include_router(payments_router)
 
 
 @app.get("/")

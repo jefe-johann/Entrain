@@ -31,11 +31,32 @@ export function StorageUsageBar({ storageInfo }: StorageUsageBarProps) {
               : ""
         }
       />
-      <p className="text-xs text-muted-foreground">
-        {isFull
-          ? "Storage full. Archive or delete old tracks to generate new ones."
-          : "Files auto-delete after 7 days. Download your tracks to keep them forever!"}
-      </p>
+      <div className="space-y-1">
+        <p className="text-xs text-muted-foreground">
+          {isFull ? (
+            <>
+              Storage full. Archive downloaded tracks to free up space—you can
+              regenerate them anytime!
+            </>
+          ) : isWarning ? (
+            <>
+              Running low on space! Archive tracks you've downloaded to stay under
+              your 250 MB limit.
+            </>
+          ) : (
+            <>
+              Files auto-delete after 7 days. Download your tracks to keep them
+              forever!
+            </>
+          )}
+        </p>
+        {!isFull && (
+          <p className="text-xs text-muted-foreground/80">
+            💡 Tip: Archive downloaded tracks to free up your 250 MB storage—regenerate
+            them anytime.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

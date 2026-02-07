@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     user_storage_limit_bytes: int = 250 * 1024 * 1024  # 250 MB
     file_retention_days: int = 7
 
+    # Stripe
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_price_map: str = ""  # JSON: {"price_xxx": 1, "price_yyy": 5, "price_zzz": 10}
+
     # Dev mode
     dev_unlimited_credits: bool = False
 

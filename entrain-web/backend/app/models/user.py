@@ -19,3 +19,4 @@ class User(Base):
 
     # Relationships
     jobs = relationship("Job", back_populates="user")
+    payments = relationship("Payment", back_populates="user")

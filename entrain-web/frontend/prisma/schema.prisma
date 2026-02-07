@@ -21,6 +21,7 @@ model User {
   accounts Account[]
   sessions Session[]
   jobs     Job[]
+  payments Payment[]
 
   @@map("users")
 }
@@ -86,4 +87,22 @@ model Job {
 
   @@index([userId])
   @@map("jobs")
+}
+
+model Payment {
+  id                      String  @id @default(uuid())
+  userId                  String  @map("user_id")
+  stripeCheckoutSessionId String  @unique @map("stripe_checkout_session_id")
+  stripePaymentIntentId   String? @map("stripe_payment_intent_id")
+  creditsPurchased        Int     @map("credits_purchased")
+  amountCents             Int     @map("amount_cents")
+  currency                String  @default("usd")
+  status                  String  @default("completed")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("payments")
 }

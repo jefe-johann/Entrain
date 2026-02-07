@@ -7,6 +7,7 @@ from .job import (
     VoiceSettings,
     LowpassFilter,
 )
+from .payment import CheckoutSessionCreate, CheckoutSessionResponse, PaymentResponse
 
 __all__ = [
     "UserCreate",
@@ -18,4 +19,7 @@ __all__ = [
     "JobConfig",
     "VoiceSettings",
     "LowpassFilter",
+    "CheckoutSessionCreate",
+    "CheckoutSessionResponse",
+    "PaymentResponse",
 ]

@@ -8,6 +8,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { ChevronDown, Music, Mic2, Settings2, Repeat } from "lucide-react";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -107,7 +108,15 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
       .filter((line) => line.length > 0).length;
     const creditsNeeded = Math.max(1, Math.ceil((affirmationCount * values.repetitions) / AFFIRMATIONS_PER_CREDIT));
     if (!isAdmin && credits < creditsNeeded) {
-      toast.error(`Insufficient credits. This job requires ${creditsNeeded} credit${creditsNeeded !== 1 ? "s" : ""} but you have ${credits}.`);
+      toast.error(
+        `Insufficient credits. This job requires ${creditsNeeded} credit${creditsNeeded !== 1 ? "s" : ""} but you have ${credits}.`,
+        {
+          action: {
+            label: "Buy Credits",
+            onClick: () => router.push("/credits"),
+          },
+        }
+      );
       return;
     }
 
@@ -303,6 +312,36 @@ My life is filled with joy and purpose`}
               <span>1x</span>
               <span>10x</span>
             </div>
+            {(() => {
+              const affirmationsText = form.watch("affirmations");
+              const repetitions = form.watch("repetitions");
+              const durationMinutes = form.watch("duration_minutes");
+              const count = affirmationsText
+                .split("\n")
+                .map((line: string) => line.trim())
+                .filter((line: string) => line.length > 0).length;
+
+              if (count === 0) return null;
+
+              const totalAffirmations = count * repetitions;
+              const durationSeconds = durationMinutes * 60;
+              const secondsBetween = durationSeconds / totalAffirmations;
+
+              const formatTime = (seconds: number) => {
+                if (seconds < 60) {
+                  return `${Math.round(seconds)}s`;
+                }
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.round(seconds % 60);
+                return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+              };
+
+              return (
+                <p className="text-xs text-muted-foreground pt-1">
+                  ~{formatTime(secondsBetween)} between each affirmation
+                </p>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -437,9 +476,16 @@ My life is filled with joy and purpose`}
       {/* Submit */}
       <div className="border-t border-border/60 pt-6">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Credits remaining: <span className="font-medium text-foreground">{isAdmin ? "∞" : credits}</span>
-          </p>
+          <div className="text-sm text-muted-foreground">
+            <p>
+              Credits remaining: <span className="font-medium text-foreground">{isAdmin ? "∞" : credits}</span>
+            </p>
+            {!isAdmin && credits === 0 && (
+              <Link href="/credits" className="text-purple-600 hover:underline text-xs">
+                Buy more credits
+              </Link>
+            )}
+          </div>
           {(() => {
             const affirmationsText = form.watch("affirmations");
             const repetitions = form.watch("repetitions");
