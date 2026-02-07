@@ -1,0 +1,67 @@
+# Render Blueprint for Entrain Backend Auto-Deployment
+services:
+  - type: web
+    name: entrain-backend-api
+    runtime: python
+    repo: https://github.com/jefe-johann/Entrain.git
+    region: ohio
+    plan: free
+    branch: main
+    rootDir: entrain-web/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    healthCheckTimeout: 100
+    autoDeployTrigger: commit  # Auto-deploy on push to main
+
+    envVars:
+      # Database (references existing Postgres)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: entrain-postgres
+          property: connectionString
+
+      # Redis (references existing Redis)
+      - key: REDIS_URL
+        fromService:
+          name: entrain-redis
+          type: redis
+          property: connectionString
+
+      # Frontend URL (public)
+      - key: FRONTEND_URL
+        value: https://www.entrain.app
+
+      # Storage
+      - key: STORAGE_TYPE
+        value: r2
+
+      - key: R2_BUCKET_NAME
+        value: entrain-audio-files
+
+      # Secrets (sync: false - set manually in dashboard)
+      - key: ELEVENLABS_API_KEY
+        sync: false
+
+      - key: R2_ACCOUNT_ID
+        sync: false
+
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+
+      - key: SECRET_KEY
+        sync: false
+
+      - key: STRIPE_SECRET_KEY
+        sync: false
+
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+
+      - key: STRIPE_PRICE_MAP
+        sync: false
+
+databases: []  # Don't create new DBs - we're referencing existing ones

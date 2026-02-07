@@ -2,6 +2,12 @@
 
 Web application for generating meditation tracks with binaural beats and spoken affirmations.
 
+**New to the project?** See the [Architecture Guide](./docs/architecture-explained.md) for a beginner-friendly deep dive, including:
+- What each service does and why
+- Local development troubleshooting
+- How the production deployment works
+- Database layer (Prisma) explained
+
 ## Architecture
 
 - **Frontend**: Next.js 15 with App Router, Auth.js, Tailwind CSS
