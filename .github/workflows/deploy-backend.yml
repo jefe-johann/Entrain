@@ -1,0 +1,12 @@
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'entrain-web/backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy
+        run: curl -s "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
