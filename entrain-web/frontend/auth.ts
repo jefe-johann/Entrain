@@ -33,18 +33,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async createUser({ user }) {
       // Sync user to backend API when created
       if (user.email) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
         try {
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/sync`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/sync`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
             body: JSON.stringify({
               email: user.email,
               name: user.name,
               image: user.image,
             }),
           });
+          if (!response.ok) {
+            console.error("Failed to sync user to backend:", response.status, response.statusText);
+          }
         } catch (error) {
           console.error("Failed to sync user to backend:", error);
+        } finally {
+          clearTimeout(timeoutId);
         }
       }
     },
