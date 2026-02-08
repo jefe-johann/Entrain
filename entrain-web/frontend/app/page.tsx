@@ -44,12 +44,14 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
               <div className="relative">
                 <div className="absolute inset-0 bg-purple-400/20 rounded-full blur-2xl scale-150 animate-pulse-glow" />
                 <Image
-                  src="/logo.png"
+                  src="/logo.webp"
                   alt="Entrain Logo"
                   width={140}
                   height={140}
                   className="relative drop-shadow-lg"
                   priority
+                  quality={90}
+                  sizes="140px"
                 />
               </div>
             </div>
@@ -242,7 +244,13 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
         <footer className="py-8 px-4 border-t border-border/40">
           <div className="container mx-auto max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Image src="/logo.png" alt="Entrain" width={24} height={24} />
+              <Image
+                src="/logo.webp"
+                alt="Entrain"
+                width={24}
+                height={24}
+                sizes="24px"
+              />
               <span className="text-sm font-medium">Entrain</span>
             </div>
             <p className="text-sm text-muted-foreground/60">

@@ -124,3 +124,39 @@
   background-size: 200% auto;
   animation: shimmer 3s linear infinite;
 }
+
+/* Performance optimizations for mobile */
+@media (max-width: 768px) {
+  .animate-float,
+  .animate-float-slow,
+  .animate-pulse-glow {
+    animation-duration: 8s;
+  }
+
+  /* Reduce expensive blur effects on mobile */
+  .blur-3xl {
+    filter: blur(48px);
+  }
+  .blur-2xl {
+    filter: blur(24px);
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-slow,
+  .animate-pulse-glow,
+  .animate-shimmer {
+    animation: none;
+  }
+  .animate-fade-in-up,
+  .animate-fade-in-up-delay-1,
+  .animate-fade-in-up-delay-2,
+  .animate-fade-in-up-delay-3,
+  .animate-fade-in-up-delay-4 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
