@@ -9,7 +9,8 @@ AFFIRMATIONS_PER_CREDIT = 50
 
 
 class BinauralPreset(str, Enum):
-    DELTA = "delta"  # 0.5-4 Hz - Deep sleep
+    DELTA = "delta"  # 2 Hz - Deep sleep
+    DELTA4 = "delta4"  # 4 Hz - Deep sleep
     THETA = "theta"  # 4-8 Hz - Meditation, creativity
     ALPHA = "alpha"  # 8-13 Hz - Relaxation
     BETA = "beta"  # 13-30 Hz - Focus, alertness
@@ -62,6 +63,7 @@ class JobConfig(BaseModel):
 
         presets = {
             BinauralPreset.DELTA: 2.0,
+            BinauralPreset.DELTA4: 4.0,
             BinauralPreset.THETA: 6.0,
             BinauralPreset.ALPHA: 10.0,
             BinauralPreset.BETA: 20.0,

@@ -41,6 +41,7 @@ const FALLBACK_VOICES: Voice[] = [
 
 const BINAURAL_PRESETS = [
   { id: "delta", name: "Delta (2 Hz)", description: "Deep sleep" },
+  { id: "delta4", name: "Delta (4 Hz)", description: "Deep sleep" },
   { id: "theta", name: "Theta (6 Hz)", description: "Meditation, creativity" },
   { id: "alpha", name: "Alpha (10 Hz)", description: "Relaxation" },
   { id: "beta", name: "Beta (20 Hz)", description: "Focus, alertness" },
@@ -53,7 +54,7 @@ const formSchema = z.object({
   affirmations: z.string().min(1, "Please enter at least one affirmation"),
   voice_id: z.string(),
   duration_minutes: z.number().min(5).max(40),
-  binaural_preset: z.enum(["delta", "theta", "alpha", "beta"]),
+  binaural_preset: z.enum(["delta", "delta4", "theta", "alpha", "beta"]),
   affirmation_volume_db: z.number().min(-30).max(0),
   binaural_volume_db: z.number().min(-30).max(0),
   voice_stability: z.number().min(0).max(1),

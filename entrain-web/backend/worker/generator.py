@@ -249,6 +249,7 @@ def generate_meditation(
         preset = config.get('binaural_preset', 'theta')
         preset_frequencies = {
             'delta': 2.0,
+            'delta4': 4.0,
             'theta': 6.0,
             'alpha': 10.0,
             'beta': 20.0,
