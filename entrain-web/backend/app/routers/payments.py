@@ -96,6 +96,12 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     if event["type"] == "checkout.session.completed":
         session_data = event["data"]["object"]
         _handle_successful_payment(session_data, db)
+    elif event["type"] == "charge.refunded":
+        charge_data = event["data"]["object"]
+        _handle_refunded_payment(charge_data, db)
+    elif event["type"] == "charge.dispute.created":
+        dispute_data = event["data"]["object"]
+        _handle_disputed_payment(dispute_data, db)
 
     return {"status": "ok"}
 
@@ -198,4 +204,80 @@ def _apply_referral_reward_if_eligible(purchased_user: User, payment: Payment, d
     referrer.credits += 1
     logger.info(
         f"Awarded 1 referral credit to {referrer.email} for first purchase by {purchased_user.email}"
+    )
+
+
+def _handle_refunded_payment(charge_data: dict, db: Session):
+    payment_intent_id = charge_data.get("payment_intent")
+    if not payment_intent_id:
+        logger.warning(f"charge.refunded without payment_intent: {charge_data.get('id')}")
+        return
+
+    payment = db.query(Payment).filter(
+        Payment.stripe_payment_intent_id == payment_intent_id
+    ).first()
+    if not payment:
+        logger.warning(f"No payment found for refunded payment_intent {payment_intent_id}")
+        return
+
+    if payment.status == "refunded":
+        return
+
+    payment.status = "refunded"
+    _reverse_referral_reward_for_payment(payment, "refund", db)
+    db.commit()
+    logger.info(f"Marked payment {payment.id} as refunded")
+
+
+def _handle_disputed_payment(dispute_data: dict, db: Session):
+    payment_intent_id = dispute_data.get("payment_intent")
+    if not payment_intent_id:
+        charge_id = dispute_data.get("charge")
+        if charge_id:
+            try:
+                charge = stripe.Charge.retrieve(charge_id)
+                payment_intent_id = charge.get("payment_intent")
+            except stripe.StripeError as error:
+                logger.error(f"Failed to resolve payment_intent for dispute charge {charge_id}: {error}")
+                return
+
+    if not payment_intent_id:
+        logger.warning(f"Unable to resolve payment_intent for dispute {dispute_data.get('id')}")
+        return
+
+    payment = db.query(Payment).filter(
+        Payment.stripe_payment_intent_id == payment_intent_id
+    ).first()
+    if not payment:
+        logger.warning(f"No payment found for disputed payment_intent {payment_intent_id}")
+        return
+
+    if payment.status == "disputed":
+        return
+
+    payment.status = "disputed"
+    _reverse_referral_reward_for_payment(payment, "dispute", db)
+    db.commit()
+    logger.info(f"Marked payment {payment.id} as disputed")
+
+
+def _reverse_referral_reward_for_payment(payment: Payment, reason: str, db: Session):
+    referral = db.query(ReferralSignup).filter(
+        ReferralSignup.reward_payment_id == payment.id
+    ).first()
+    if not referral:
+        return
+
+    referrer = db.query(User).filter(User.id == referral.referrer_user_id).first()
+    if not referrer:
+        logger.warning(
+            f"Referrer {referral.referrer_user_id} not found while reversing referral {referral.id}"
+        )
+    elif referrer.credits > 0:
+        referrer.credits -= 1
+
+    referral.reward_payment_id = None
+    referral.rewarded_at = None
+    logger.info(
+        f"Reversed referral credit for referral {referral.id} because of {reason} on payment {payment.id}"
     )

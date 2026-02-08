@@ -63,6 +63,10 @@ export default async function SharesPage() {
 
             <ReferralLinkCard referralLink={referralLink} />
 
+            <p className="text-sm text-muted-foreground">
+              Note: if a referred user later receives a refund or opens a payment dispute, the referral credit is removed.
+            </p>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <Card className="border-0 shadow-md bg-white/80 backdrop-blur-sm">
                 <CardHeader className="pb-2">
