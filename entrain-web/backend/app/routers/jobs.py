@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from ..database import get_db
 from ..config import get_settings
 from ..models import User, Job
-from ..schemas import JobCreate, JobResponse, JobStatusResponse
+from ..schemas import JobCreate, JobResponse, JobStatusResponse, JobUpdate
 from ..services import get_queue_service, get_storage_service, cleanup_expired_jobs
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
@@ -184,6 +184,30 @@ def get_job_status(
         progress_message=job.progress_message,
         error_message=job.error_message,
     )
+
+
+@router.patch("/{job_id}", response_model=JobResponse)
+def update_job(
+    job_id: str,
+    job_data: JobUpdate,
+    email: str = Depends(get_current_user_email),
+    db: Session = Depends(get_db),
+):
+    """Update a job's title."""
+    user = get_user_by_email(email, db)
+
+    job = db.query(Job).filter(Job.id == job_id, Job.user_id == user.id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Update title in config JSON
+    config = dict(job.config)
+    config["title"] = job_data.title
+    job.config = config
+    db.commit()
+    db.refresh(job)
+
+    return job
 
 
 @router.delete("/{job_id}")

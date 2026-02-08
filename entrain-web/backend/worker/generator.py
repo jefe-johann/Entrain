@@ -27,7 +27,6 @@ VOICES = {
     "Brian": "nPczCjzI2devNBz1zQrb",
     "Charlie": "IKne3meq5aSn9XLyUdCD",
     "Jon": "Cz0K1kOv9tD8l0b5Qu53",
-    "Clancy": "FLpz0UhC9a7CIfUSBo6S",
 }
 
 # Default audio settings

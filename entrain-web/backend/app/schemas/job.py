@@ -75,6 +75,12 @@ class JobCreate(BaseModel):
     config: JobConfig
 
 
+class JobUpdate(BaseModel):
+    """Schema for updating a job."""
+
+    title: str = Field(..., max_length=100)
+
+
 class JobStatusResponse(BaseModel):
     """Lightweight status response for polling."""
 

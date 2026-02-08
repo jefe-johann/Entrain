@@ -37,7 +37,6 @@ const FALLBACK_VOICES: Voice[] = [
   { id: "Brian", name: "Brian", preview_url: null },
   { id: "Charlie", name: "Charlie", preview_url: null },
   { id: "Jon", name: "Jon", preview_url: null },
-  { id: "Clancy", name: "Clancy", preview_url: null },
 ];
 
 const BINAURAL_PRESETS = [

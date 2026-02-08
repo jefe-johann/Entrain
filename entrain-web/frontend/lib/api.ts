@@ -162,6 +162,13 @@ class ApiClient {
     return this.fetch<Job>(`/api/jobs/${jobId}/regenerate`, { method: "POST" });
   }
 
+  async renameJob(jobId: string, title: string): Promise<Job> {
+    return this.fetch<Job>(`/api/jobs/${jobId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ title }),
+    });
+  }
+
   // Payment endpoints
   async createCheckoutSession(priceId: string): Promise<{ checkout_url: string }> {
     return this.fetch<{ checkout_url: string }>("/api/payments/create-checkout-session", {

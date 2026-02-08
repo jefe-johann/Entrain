@@ -118,6 +118,7 @@ export function DashboardClient({ userEmail }: DashboardClientProps) {
             onDelete={() => handleDelete(job.id)}
             onArchive={handleArchive}
             onRegenerate={handleRegenerate}
+            onComplete={refreshStorage}
           />
         </div>
       ))}

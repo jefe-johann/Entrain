@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Download, Loader2, CheckCircle, XCircle, Clock, Archive, RefreshCw, Trash2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Download, Loader2, CheckCircle, XCircle, Clock, Archive, RefreshCw, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -16,13 +16,47 @@ interface JobStatusCardProps {
   onDelete?: () => void;
   onArchive?: (archivedJob: Job) => void;
   onRegenerate?: (newJob: Job) => void;
+  onComplete?: () => void;
 }
 
-export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive, onRegenerate }: JobStatusCardProps) {
+export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive, onRegenerate, onComplete }: JobStatusCardProps) {
   const [job, setJob] = useState(initialJob);
   const [isPolling, setIsPolling] = useState(
     initialJob.status === "pending" || initialJob.status === "processing"
   );
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(initialJob.config.title || "");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const canEdit = job.status === "completed" || job.status === "archived";
+
+  const handleRename = async () => {
+    const trimmed = editTitle.trim();
+    if (!trimmed || trimmed === (job.config.title || "")) {
+      setIsEditing(false);
+      setEditTitle(job.config.title || "");
+      return;
+    }
+
+    try {
+      api.setUserEmail(userEmail);
+      const updatedJob = await api.renameJob(job.id, trimmed);
+      setJob(updatedJob);
+      setEditTitle(trimmed);
+      toast.success("Track renamed");
+    } catch {
+      toast.error("Failed to rename track");
+      setEditTitle(job.config.title || "");
+    }
+    setIsEditing(false);
+  };
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
 
   // Poll for status updates
   useEffect(() => {
@@ -48,6 +82,7 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
             // Fetch full job to get file info
             const fullJob = await api.getJob(job.id);
             setJob(fullJob);
+            onComplete?.();
           } else if (status.status === "failed") {
             toast.error("Generation failed: " + (status.error_message || "Unknown error"));
           }
@@ -183,11 +218,35 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             {statusIcon[job.status]}
-            <CardTitle className="text-lg">
-              {config.title || config.voice_id} - {formatDuration(config.duration_minutes || 40)}
-            </CardTitle>
+            {isEditing ? (
+              <input
+                ref={inputRef}
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                onBlur={handleRename}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleRename();
+                  if (e.key === "Escape") {
+                    setEditTitle(job.config.title || "");
+                    setIsEditing(false);
+                  }
+                }}
+                maxLength={100}
+                className="text-lg font-semibold bg-transparent border-b border-primary outline-none px-0 py-0 w-full"
+              />
+            ) : (
+              <CardTitle
+                className={`text-lg ${canEdit ? "cursor-pointer hover:text-primary transition-colors group/title" : ""}`}
+                onClick={canEdit ? () => { setEditTitle(config.title || config.voice_id || ""); setIsEditing(true); } : undefined}
+              >
+                <span>{config.title || config.voice_id} - {formatDuration(config.duration_minutes || 40)}</span>
+                {canEdit && (
+                  <Pencil className="inline-block ml-1.5 h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover/title:opacity-100 transition-opacity" />
+                )}
+              </CardTitle>
+            )}
           </div>
           <div className="text-sm text-muted-foreground">
             {new Date(job.created_at).toLocaleDateString()}
