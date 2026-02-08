@@ -4,8 +4,18 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Waves, MessageSquareText, Mic, Headphones, PenLine, Sparkles, Download, ChevronDown } from "lucide-react";
+import { normalizeReferralCode } from "@/lib/referrals";
 
-export default async function LandingPage() {
+interface LandingPageProps {
+  searchParams: Promise<{ ref?: string | string[] }>;
+}
+
+export default async function LandingPage({ searchParams }: LandingPageProps) {
+  const params = await searchParams;
+  const referralCode = normalizeReferralCode(params.ref);
+  const signInRedirectPath = referralCode
+    ? `/generate?ref=${encodeURIComponent(referralCode)}`
+    : "/generate";
   const session = await auth();
 
   // If user is already signed in, redirect to generate page
@@ -62,7 +72,7 @@ export default async function LandingPage() {
               <form
                 action={async () => {
                   "use server";
-                  await signIn("google", { redirectTo: "/generate" });
+                  await signIn("google", { redirectTo: signInRedirectPath });
                 }}
               >
                 <Button
@@ -207,7 +217,7 @@ export default async function LandingPage() {
                 <form
                   action={async () => {
                     "use server";
-                    await signIn("google", { redirectTo: "/generate" });
+                    await signIn("google", { redirectTo: signInRedirectPath });
                   }}
                   className="flex flex-col items-center"
                 >

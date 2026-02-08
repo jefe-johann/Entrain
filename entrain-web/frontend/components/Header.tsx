@@ -18,6 +18,7 @@ export function Header({ credits, isAdmin }: HeaderProps) {
   const navItems = [
     { href: "/generate", label: "Generate" },
     { href: "/dashboard", label: "History" },
+    { href: "/shares", label: "Earn Credits" },
     { href: "/config-notes", label: "Affirmation Tips" },
   ];
 

@@ -41,7 +41,7 @@ const FALLBACK_VOICES: Voice[] = [
 
 const BINAURAL_PRESETS = [
   { id: "delta", name: "Delta (2 Hz)", description: "Deep sleep" },
-  { id: "delta4", name: "Delta (4 Hz)", description: "Deep sleep" },
+  { id: "delta4", name: "Delta (4 Hz)", description: "Sleep" },
   { id: "theta", name: "Theta (6 Hz)", description: "Meditation, creativity" },
   { id: "alpha", name: "Alpha (10 Hz)", description: "Relaxation" },
   { id: "beta", name: "Beta (20 Hz)", description: "Focus, alertness" },
@@ -392,7 +392,7 @@ My life is filled with joy and purpose`}
 
               return (
                 <p className="text-xs text-muted-foreground pt-1">
-                  ~{formatTime(secondsBetween)} between each affirmation
+                  ~{formatTime(secondsBetween)} between each affirmation. Affirmation order will be randomized.
                 </p>
               );
             })()}

@@ -22,6 +22,8 @@ model User {
   sessions Session[]
   jobs     Job[]
   payments Payment[]
+  referralsSent ReferralSignup[] @relation("Referrer")
+  referralReceived ReferralSignup? @relation("Referred")
 
   @@map("users")
 }
@@ -102,7 +104,25 @@ model Payment {
   createdAt DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referralRewards ReferralSignup[]
 
   @@index([userId])
   @@map("payments")
+}
+
+model ReferralSignup {
+  id            String   @id @default(uuid())
+  referrerUserId String   @map("referrer_user_id")
+  referredUserId String   @unique @map("referred_user_id")
+  rewardPaymentId String? @map("reward_payment_id")
+  rewardedAt    DateTime? @map("rewarded_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  referrer User @relation("Referrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
+  referred User @relation("Referred", fields: [referredUserId], references: [id], onDelete: Cascade)
+  rewardPayment Payment? @relation(fields: [rewardPaymentId], references: [id], onDelete: SetNull)
+
+  @@index([referrerUserId])
+  @@index([rewardedAt])
+  @@map("referral_signups")
 }

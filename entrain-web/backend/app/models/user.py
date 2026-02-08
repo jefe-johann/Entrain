@@ -20,3 +20,14 @@ class User(Base):
     # Relationships
     jobs = relationship("Job", back_populates="user")
     payments = relationship("Payment", back_populates="user")
+    referrals_sent = relationship(
+        "ReferralSignup",
+        foreign_keys="ReferralSignup.referrer_user_id",
+        back_populates="referrer",
+    )
+    referral_received = relationship(
+        "ReferralSignup",
+        foreign_keys="ReferralSignup.referred_user_id",
+        back_populates="referred",
+        uselist=False,
+    )

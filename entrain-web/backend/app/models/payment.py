@@ -25,3 +25,4 @@ class Payment(Base):
 
     # Relationships
     user = relationship("User", back_populates="payments")
+    referral_rewards = relationship("ReferralSignup", back_populates="reward_payment")

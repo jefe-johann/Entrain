@@ -5,17 +5,37 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GeneratorForm } from "@/components/GeneratorForm";
 import { Headphones } from "lucide-react";
 import type { Metadata } from "next";
+import { captureReferralSignup, normalizeReferralCode } from "@/lib/referrals";
 
 export const metadata: Metadata = {
   title: "Generate Track - Entrain",
   description: "Customize and generate your personalized meditation track with binaural beats and spoken affirmations",
 };
 
-export default async function GeneratePage() {
+interface GeneratePageProps {
+  searchParams: Promise<{ ref?: string | string[] }>;
+}
+
+export default async function GeneratePage({ searchParams }: GeneratePageProps) {
   const session = await auth();
 
   if (!session?.user) {
     redirect("/");
+  }
+
+  const params = await searchParams;
+  const referralCode = normalizeReferralCode(params.ref);
+  if (referralCode) {
+    try {
+      await captureReferralSignup({
+        referredUserId: session.user.id,
+        referrerUserId: referralCode,
+      });
+    } catch (error) {
+      console.error("Failed to capture referral attribution:", error);
+    }
+
+    redirect("/generate");
   }
 
   return (

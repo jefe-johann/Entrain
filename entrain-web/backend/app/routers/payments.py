@@ -4,10 +4,11 @@ import stripe
 from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from sqlalchemy.orm import Session
 from typing import Optional
+from datetime import datetime, timezone
 
 from ..database import get_db
 from ..config import get_settings
-from ..models import User, Payment
+from ..models import User, Payment, ReferralSignup
 from ..schemas.payment import CheckoutSessionCreate, CheckoutSessionResponse
 
 router = APIRouter(prefix="/api/payments", tags=["payments"])
@@ -128,6 +129,11 @@ def _handle_successful_payment(session_data: dict, db: Session):
         logger.error(f"User not found for payment: {user_email}")
         return
 
+    had_prior_completed_payment = db.query(Payment.id).filter(
+        Payment.user_id == user.id,
+        Payment.status == "completed",
+    ).first() is not None
+
     # Add credits
     user.credits += credits
 
@@ -142,5 +148,54 @@ def _handle_successful_payment(session_data: dict, db: Session):
         status="completed",
     )
     db.add(payment)
+    db.flush()
+
+    if not had_prior_completed_payment:
+        _apply_referral_reward_if_eligible(
+            purchased_user=user,
+            payment=payment,
+            db=db,
+        )
+
     db.commit()
     logger.info(f"Added {credits} credits to user {user.email} (payment {checkout_session_id})")
+
+
+def _apply_referral_reward_if_eligible(purchased_user: User, payment: Payment, db: Session):
+    referral = db.query(ReferralSignup).filter(
+        ReferralSignup.referred_user_id == purchased_user.id
+    ).first()
+    if not referral:
+        return
+
+    if referral.rewarded_at:
+        return
+
+    if referral.referrer_user_id == purchased_user.id:
+        logger.warning(f"Skipping self-referral reward for user {purchased_user.id}")
+        return
+
+    referrer = db.query(User).filter(User.id == referral.referrer_user_id).first()
+    if not referrer:
+        logger.warning(
+            f"Referrer not found for referral signup {referral.id} (referrer {referral.referrer_user_id})"
+        )
+        return
+
+    marked_rows = db.query(ReferralSignup).filter(
+        ReferralSignup.id == referral.id,
+        ReferralSignup.rewarded_at.is_(None),
+    ).update(
+        {
+            ReferralSignup.reward_payment_id: payment.id,
+            ReferralSignup.rewarded_at: datetime.now(timezone.utc),
+        },
+        synchronize_session=False,
+    )
+    if marked_rows == 0:
+        return
+
+    referrer.credits += 1
+    logger.info(
+        f"Awarded 1 referral credit to {referrer.email} for first purchase by {purchased_user.email}"
+    )
