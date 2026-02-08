@@ -4,7 +4,7 @@ from typing import Optional
 
 from ..database import get_db
 from ..models import User
-from ..schemas import UserSync, UserResponse
+from ..schemas import UserSync, UserResponse, UserApiKeyUpdate
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -44,7 +44,7 @@ def sync_user(user_data: UserSync, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(user)
 
-    return user
+    return UserResponse.from_orm_user(user)
 
 
 @router.get("/me", response_model=UserResponse)
@@ -57,4 +57,23 @@ def get_current_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return user
+    return UserResponse.from_orm_user(user)
+
+
+@router.patch("/me/api-key", response_model=UserResponse)
+def update_api_key(
+    data: UserApiKeyUpdate,
+    email: str = Depends(get_current_user_email),
+    db: Session = Depends(get_db),
+):
+    """Set or update the user's ElevenLabs API key."""
+    user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.elevenlabs_api_key = data.elevenlabs_api_key
+    db.commit()
+    db.refresh(user)
+
+    return UserResponse.from_orm_user(user)

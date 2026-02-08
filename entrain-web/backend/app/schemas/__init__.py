@@ -1,4 +1,4 @@
-from .user import UserCreate, UserResponse, UserSync
+from .user import UserCreate, UserResponse, UserSync, UserApiKeyUpdate
 from .job import (
     JobCreate,
     JobResponse,
@@ -9,11 +9,13 @@ from .job import (
     LowpassFilter,
 )
 from .payment import CheckoutSessionCreate, CheckoutSessionResponse, PaymentResponse
+from .custom_voice import CustomVoiceCreate, CustomVoiceResponse
 
 __all__ = [
     "UserCreate",
     "UserResponse",
     "UserSync",
+    "UserApiKeyUpdate",
     "JobCreate",
     "JobResponse",
     "JobStatusResponse",
@@ -24,4 +26,6 @@ __all__ = [
     "CheckoutSessionCreate",
     "CheckoutSessionResponse",
     "PaymentResponse",
+    "CustomVoiceCreate",
+    "CustomVoiceResponse",
 ]

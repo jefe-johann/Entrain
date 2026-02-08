@@ -8,6 +8,22 @@ interface Voice {
   id: string;
   name: string;
   preview_url: string | null;
+  is_custom?: boolean;
+}
+
+interface CustomVoice {
+  id: string;
+  user_id: string;
+  name: string;
+  elevenlabs_voice_id: string;
+  use_user_api_key: boolean;
+  created_at: string;
+}
+
+interface CustomVoiceCreate {
+  name: string;
+  elevenlabs_voice_id: string;
+  use_user_api_key: boolean;
 }
 
 interface JobConfig {
@@ -30,6 +46,7 @@ interface JobConfig {
     cutoff_hz?: number;
   };
   repetitions?: number;
+  use_user_api_key?: boolean;
 }
 
 interface Job {
@@ -68,6 +85,7 @@ interface User {
   name: string | null;
   image: string | null;
   credits: number;
+  has_elevenlabs_api_key: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -182,6 +200,29 @@ class ApiClient {
     return this.fetch<Voice[]>("/api/voices");
   }
 
+  // Custom voice endpoints
+  async createCustomVoice(data: CustomVoiceCreate): Promise<CustomVoice> {
+    return this.fetch<CustomVoice>("/api/custom-voices", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async listCustomVoices(): Promise<CustomVoice[]> {
+    return this.fetch<CustomVoice[]>("/api/custom-voices");
+  }
+
+  async deleteCustomVoice(voiceId: string): Promise<void> {
+    await this.fetch(`/api/custom-voices/${voiceId}`, { method: "DELETE" });
+  }
+
+  async updateApiKey(apiKey: string | null): Promise<User> {
+    return this.fetch<User>("/api/users/me/api-key", {
+      method: "PATCH",
+      body: JSON.stringify({ elevenlabs_api_key: apiKey }),
+    });
+  }
+
   // File endpoints
   getDownloadUrl(jobId: string): string {
     return `${this.baseUrl}/api/files/${jobId}`;
@@ -189,4 +230,4 @@ class ApiClient {
 }
 
 export const api = new ApiClient();
-export type { Job, JobConfig, JobStatus, StorageInfo, User, Voice };
+export type { Job, JobConfig, JobStatus, StorageInfo, User, Voice, CustomVoice, CustomVoiceCreate };

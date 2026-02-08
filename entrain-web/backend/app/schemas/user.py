@@ -27,8 +27,28 @@ class UserResponse(BaseModel):
     name: Optional[str]
     image: Optional[str]
     credits: int
+    has_elevenlabs_api_key: bool = False
     created_at: datetime
     updated_at: datetime
 
     class Config:
         from_attributes = True
+
+    @classmethod
+    def from_orm_user(cls, user):
+        return cls(
+            id=user.id,
+            email=user.email,
+            name=user.name,
+            image=user.image,
+            credits=user.credits,
+            has_elevenlabs_api_key=bool(user.elevenlabs_api_key),
+            created_at=user.created_at,
+            updated_at=user.updated_at,
+        )
+
+
+class UserApiKeyUpdate(BaseModel):
+    """Schema for updating user's ElevenLabs API key."""
+
+    elevenlabs_api_key: Optional[str] = None

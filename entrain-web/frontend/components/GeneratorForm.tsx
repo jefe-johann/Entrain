@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ChevronDown, Music, Mic2, Settings2, Repeat, Play, Square } from "lucide-react";
+import { ChevronDown, Music, Mic2, Settings2, Repeat, Play, Square, Plus, Trash2 } from "lucide-react";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { api, JobConfig, Voice } from "@/lib/api";
+import { api, JobConfig, Voice, CustomVoice } from "@/lib/api";
+import { AddCustomVoiceDialog } from "@/components/AddCustomVoiceDialog";
 
 const FALLBACK_VOICES: Voice[] = [
   { id: "Clara", name: "Clara", preview_url: null },
@@ -86,12 +87,22 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [voices, setVoices] = useState<Voice[]>(FALLBACK_VOICES);
+  const [customVoices, setCustomVoices] = useState<CustomVoice[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [userHasApiKey, setUserHasApiKey] = useState(false);
   const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
+  const fetchVoicesAndUser = () => {
+    api.setUserEmail(userEmail);
     api.getVoices().then(setVoices).catch(() => setVoices(FALLBACK_VOICES));
-  }, []);
+    api.listCustomVoices().then(setCustomVoices).catch(() => {});
+    api.getMe().then((u) => setUserHasApiKey(u.has_elevenlabs_api_key)).catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchVoicesAndUser();
+  }, [userEmail]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -169,6 +180,11 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
         return;
       }
 
+      // Check if selected voice is a custom voice that uses user's API key
+      const selectedCustomVoice = customVoices.find(
+        (cv) => cv.elevenlabs_voice_id === values.voice_id
+      );
+
       // Build config
       const config: JobConfig = {
         affirmations: affirmationsList,
@@ -189,10 +205,8 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
           cutoff_hz: values.lowpass_cutoff,
         },
         repetitions: values.repetitions,
+        use_user_api_key: selectedCustomVoice?.use_user_api_key ?? false,
       };
-
-      // Set user email for API auth
-      api.setUserEmail(userEmail);
 
       // Create job
       const job = await api.createJob(config);
@@ -286,7 +300,7 @@ My life is filled with joy and purpose`}
                 <SelectContent>
                   {voices.map((voice) => (
                     <SelectItem key={voice.id} value={voice.id}>
-                      {voice.name}
+                      {voice.name}{voice.is_custom ? " *" : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -308,7 +322,56 @@ My life is filled with joy and purpose`}
                   <Play className="w-4 h-4" />
                 )}
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setDialogOpen(true)}
+                title="Add custom voice"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
             </div>
+            {customVoices.length > 0 && (
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <button type="button" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors pt-1">
+                    <ChevronDown className="w-3 h-3" />
+                    {customVoices.length} custom voice{customVoices.length !== 1 ? "s" : ""}
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-1 pt-1">
+                  {customVoices.map((cv) => (
+                    <div key={cv.id} className="flex items-center justify-between text-xs bg-secondary/40 rounded px-2 py-1">
+                      <span>
+                        {cv.name}
+                        {cv.use_user_api_key && (
+                          <span className="text-muted-foreground ml-1">
+                            (Using your API key)
+                          </span>
+                        )}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await api.deleteCustomVoice(cv.id);
+                            toast.success(`Removed "${cv.name}"`);
+                            fetchVoicesAndUser();
+                          } catch {
+                            toast.error("Failed to remove voice");
+                          }
+                        }}
+                        className="text-muted-foreground hover:text-destructive ml-2"
+                        title="Remove"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+            )}
           </div>
 
           {/* Binaural Preset */}
@@ -562,6 +625,13 @@ My life is filled with joy and purpose`}
           })()}
         </div>
       </div>
+
+      <AddCustomVoiceDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        userHasApiKey={userHasApiKey}
+        onVoiceAdded={fetchVoicesAndUser}
+      />
     </form>
   );
 }

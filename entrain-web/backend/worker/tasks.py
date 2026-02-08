@@ -17,7 +17,7 @@ load_dotenv()
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.models import Job
+from app.models import Job, User
 from app.services.storage import StorageService
 from worker.generator import generate_meditation
 
@@ -76,9 +76,15 @@ def generate_meditation_task(job_id: str):
         db.commit()
 
         # Get ElevenLabs API key
-        elevenlabs_api_key = os.getenv("ELEVENLABS_API_KEY")
-        if not elevenlabs_api_key:
-            raise ValueError("ELEVENLABS_API_KEY not configured")
+        if job.config.get('use_user_api_key', False):
+            user = db.query(User).filter(User.id == job.user_id).first()
+            if not user or not user.elevenlabs_api_key:
+                raise ValueError("User ElevenLabs API key not configured")
+            elevenlabs_api_key = user.elevenlabs_api_key
+        else:
+            elevenlabs_api_key = os.getenv("ELEVENLABS_API_KEY")
+            if not elevenlabs_api_key:
+                raise ValueError("ELEVENLABS_API_KEY not configured")
 
         # Determine output path
         output_filename = f"meditation-{job_id}.flac"

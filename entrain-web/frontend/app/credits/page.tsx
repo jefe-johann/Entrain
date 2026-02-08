@@ -34,7 +34,7 @@ export default async function CreditsPage() {
               <div>
                 <h1 className="text-2xl font-bold">Buy Credits</h1>
                 <p className="text-muted-foreground text-sm">
-                  You have{" "}
+                  {session.user.email} &middot;{" "}
                   {session.user.isAdmin
                     ? "unlimited"
                     : session.user.credits}{" "}

@@ -51,6 +51,7 @@ class JobConfig(BaseModel):
     voice_settings: VoiceSettings = Field(default_factory=VoiceSettings)
     lowpass_filter: LowpassFilter = Field(default_factory=LowpassFilter)
     repetitions: int = Field(default=1, ge=1, le=10)
+    use_user_api_key: bool = False
 
     def credits_required(self) -> int:
         total = len(self.affirmations) * self.repetitions

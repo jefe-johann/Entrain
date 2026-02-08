@@ -18,12 +18,15 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  elevenLabsApiKey String? @map("elevenlabs_api_key")
+
   accounts Account[]
   sessions Session[]
   jobs     Job[]
   payments Payment[]
   referralsSent ReferralSignup[] @relation("Referrer")
   referralReceived ReferralSignup? @relation("Referred")
+  customVoices     CustomVoice[]
 
   @@map("users")
 }
@@ -125,4 +128,19 @@ model ReferralSignup {
   @@index([referrerUserId])
   @@index([rewardedAt])
   @@map("referral_signups")
+}
+
+model CustomVoice {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  name              String
+  elevenLabsVoiceId String   @map("elevenlabs_voice_id")
+  useUserApiKey     Boolean  @default(false) @map("use_user_api_key")
+  previewUrl        String?  @map("preview_url")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("custom_voices")
 }

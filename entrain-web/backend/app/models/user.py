@@ -13,12 +13,14 @@ class User(Base):
     name = Column(String, nullable=True)
     image = Column(String, nullable=True)
     credits = Column(Integer, default=1, nullable=False)
+    elevenlabs_api_key = Column(String, nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     # Relationships
     jobs = relationship("Job", back_populates="user")
+    custom_voices = relationship("CustomVoice", back_populates="user")
     payments = relationship("Payment", back_populates="user")
     referrals_sent = relationship(
         "ReferralSignup",
