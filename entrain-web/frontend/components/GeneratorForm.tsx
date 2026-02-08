@@ -316,7 +316,7 @@ My life is filled with joy and purpose`}
             <Label>Binaural Frequency</Label>
             <Select
               value={form.watch("binaural_preset")}
-              onValueChange={(value: "delta" | "theta" | "alpha" | "beta") =>
+              onValueChange={(value: "delta" | "delta4" | "theta" | "alpha" | "beta") =>
                 form.setValue("binaural_preset", value)
               }
             >

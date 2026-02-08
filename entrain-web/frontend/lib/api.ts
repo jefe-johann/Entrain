@@ -15,7 +15,7 @@ interface JobConfig {
   title?: string;
   voice_id?: string;
   duration_minutes?: number;
-  binaural_preset?: "delta" | "theta" | "alpha" | "beta";
+  binaural_preset?: "delta" | "delta4" | "theta" | "alpha" | "beta";
   binaural_frequency_hz?: number;
   affirmation_volume_db?: number;
   binaural_volume_db?: number;
