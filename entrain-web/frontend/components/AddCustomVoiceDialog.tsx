@@ -137,6 +137,7 @@ export function AddCustomVoiceDialog({
               <Label htmlFor="lib-name">Display Name</Label>
               <Input
                 id="lib-name"
+                name="lib_name"
                 placeholder="e.g., Sarah"
                 value={libName}
                 onChange={(e) => setLibName(e.target.value)}
@@ -147,6 +148,7 @@ export function AddCustomVoiceDialog({
               <Label htmlFor="lib-voice-id">Voice ID</Label>
               <Input
                 id="lib-voice-id"
+                name="lib_voice_id"
                 placeholder="e.g., EXAVITQu4vr4xnSDxMaL"
                 value={libVoiceId}
                 onChange={(e) => setLibVoiceId(e.target.value)}
@@ -189,6 +191,7 @@ export function AddCustomVoiceDialog({
               <Label htmlFor="clone-name">Display Name</Label>
               <Input
                 id="clone-name"
+                name="clone_name"
                 placeholder="e.g., My Voice"
                 value={cloneName}
                 onChange={(e) => setCloneName(e.target.value)}
@@ -199,6 +202,7 @@ export function AddCustomVoiceDialog({
               <Label htmlFor="clone-voice-id">Voice ID</Label>
               <Input
                 id="clone-voice-id"
+                name="clone_voice_id"
                 placeholder="e.g., EXAVITQu4vr4xnSDxMaL"
                 value={cloneVoiceId}
                 onChange={(e) => setCloneVoiceId(e.target.value)}
@@ -216,6 +220,7 @@ export function AddCustomVoiceDialog({
               </Label>
               <Input
                 id="clone-api-key"
+                name="clone_api_key"
                 type="password"
                 placeholder={userHasApiKey ? "Leave blank to keep current key" : "xi-api-key..."}
                 value={cloneApiKey}

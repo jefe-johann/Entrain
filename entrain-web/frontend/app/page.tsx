@@ -26,7 +26,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Atmospheric background */}
-      <div className="fixed inset-0 bg-gradient-to-b from-purple-50 via-white to-indigo-50/50" />
+      <div className="fixed inset-0 bg-gradient-to-b from-purple-50 via-white to-indigo-50/50 pointer-events-none" />
 
       {/* Decorative gradient orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">

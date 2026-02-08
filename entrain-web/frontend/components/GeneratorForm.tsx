@@ -221,6 +221,15 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
     }
   };
 
+  const selectedVoiceId = form.watch("voice_id");
+  const selectedVoice = voices.find((voice) => voice.id === selectedVoiceId);
+  const isPreviewAvailable = Boolean(selectedVoice?.preview_url);
+  const isSelectedVoicePlaying = playingVoiceId === selectedVoiceId;
+  const voiceSelectId = "voice-select";
+  const binauralPresetId = "binaural-preset-select";
+  const voiceSelectLabelId = "voice-select-label";
+  const binauralPresetLabelId = "binaural-preset-label";
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
       {/* Content Section */}
@@ -288,13 +297,18 @@ My life is filled with joy and purpose`}
         <div className="grid gap-6 md:grid-cols-2">
           {/* Voice */}
           <div className="space-y-2">
-            <Label htmlFor="voice">Voice</Label>
+            <p id={voiceSelectLabelId} className="text-sm font-medium leading-none">Voice</p>
             <div className="flex gap-2">
               <Select
-                value={form.watch("voice_id")}
+                name="voice_id"
+                value={selectedVoiceId}
                 onValueChange={(value) => form.setValue("voice_id", value)}
               >
-                <SelectTrigger className="bg-white/60 flex-1">
+                <SelectTrigger
+                  id={voiceSelectId}
+                  aria-labelledby={voiceSelectLabelId}
+                  className="bg-white/60 flex-1"
+                >
                   <SelectValue placeholder="Select a voice" />
                 </SelectTrigger>
                 <SelectContent>
@@ -305,32 +319,45 @@ My life is filled with joy and purpose`}
                   ))}
                 </SelectContent>
               </Select>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => {
-                  const selected = voices.find(v => v.id === form.watch("voice_id"));
-                  if (selected) togglePreview(selected.id, selected.preview_url);
-                }}
-                disabled={!voices.find(v => v.id === form.watch("voice_id"))?.preview_url}
-                title={playingVoiceId === form.watch("voice_id") ? "Stop preview" : "Preview voice"}
-              >
-                {playingVoiceId === form.watch("voice_id") ? (
-                  <Square className="w-4 h-4" />
-                ) : (
-                  <Play className="w-4 h-4" />
+              <div className="relative group/preview">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    if (selectedVoice) {
+                      togglePreview(selectedVoice.id, selectedVoice.preview_url);
+                    }
+                  }}
+                  disabled={!isPreviewAvailable}
+                  aria-label={isSelectedVoicePlaying ? "Stop voice sample" : "Hear voice sample"}
+                >
+                  {isSelectedVoicePlaying ? (
+                    <Square className="w-4 h-4" />
+                  ) : (
+                    <Play className="w-4 h-4" />
+                  )}
+                </Button>
+                {isPreviewAvailable && (
+                  <span className="pointer-events-none absolute -top-9 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-[11px] font-medium text-background opacity-0 shadow-sm transition-opacity duration-200 group-hover/preview:opacity-100 group-focus-within/preview:opacity-100">
+                    Hear voice sample
+                  </span>
                 )}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => setDialogOpen(true)}
-                title="Add custom voice"
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
+              </div>
+              <div className="relative group/add-voice">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setDialogOpen(true)}
+                  aria-label="Add other voices"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+                <span className="pointer-events-none absolute -top-9 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-[11px] font-medium text-background opacity-0 shadow-sm transition-opacity duration-200 group-hover/add-voice:opacity-100 group-focus-within/add-voice:opacity-100">
+                  Add other voices...
+                </span>
+              </div>
             </div>
             {customVoices.length > 0 && (
               <Collapsible>
@@ -376,14 +403,19 @@ My life is filled with joy and purpose`}
 
           {/* Binaural Preset */}
           <div className="space-y-2">
-            <Label>Binaural Frequency</Label>
+            <p id={binauralPresetLabelId} className="text-sm font-medium leading-none">Binaural Frequency</p>
             <Select
+              name="binaural_preset"
               value={form.watch("binaural_preset")}
               onValueChange={(value: "delta" | "delta4" | "theta" | "alpha" | "beta") =>
                 form.setValue("binaural_preset", value)
               }
             >
-              <SelectTrigger className="bg-white/60">
+              <SelectTrigger
+                id={binauralPresetId}
+                aria-labelledby={binauralPresetLabelId}
+                className="bg-white/60"
+              >
                 <SelectValue placeholder="Select frequency" />
               </SelectTrigger>
               <SelectContent>
@@ -398,8 +430,12 @@ My life is filled with joy and purpose`}
 
           {/* Duration */}
           <div className="space-y-3">
-            <Label>Duration: {form.watch("duration_minutes")} minutes</Label>
+            <p id="duration-minutes-label" className="text-sm font-medium leading-none">
+              Duration: {form.watch("duration_minutes")} minutes
+            </p>
             <Slider
+              name="duration_minutes"
+              aria-labelledby="duration-minutes-label"
               value={[form.watch("duration_minutes")]}
               onValueChange={([value]) => form.setValue("duration_minutes", value)}
               min={5}
@@ -414,11 +450,13 @@ My life is filled with joy and purpose`}
 
           {/* Repetitions */}
           <div className="space-y-3">
-            <Label className="flex items-center gap-1.5">
+            <p id="repetitions-label" className="text-sm font-medium leading-none flex items-center gap-1.5">
               <Repeat className="w-3.5 h-3.5 text-muted-foreground" />
               Repetitions: {form.watch("repetitions")}x
-            </Label>
+            </p>
             <Slider
+              name="repetitions"
+              aria-labelledby="repetitions-label"
               value={[form.watch("repetitions")]}
               onValueChange={([value]) => form.setValue("repetitions", value)}
               min={1}
@@ -490,8 +528,12 @@ My life is filled with joy and purpose`}
           <div className="grid gap-6 md:grid-cols-2">
             {/* Affirmation Volume */}
             <div className="space-y-3">
-              <Label>Affirmation Volume: {form.watch("affirmation_volume_db")} dB</Label>
+              <p id="affirmation-volume-label" className="text-sm font-medium leading-none">
+                Affirmation Volume: {form.watch("affirmation_volume_db")} dB
+              </p>
               <Slider
+                name="affirmation_volume_db"
+                aria-labelledby="affirmation-volume-label"
                 value={[form.watch("affirmation_volume_db")]}
                 onValueChange={([value]) => form.setValue("affirmation_volume_db", value)}
                 min={-30}
@@ -506,8 +548,12 @@ My life is filled with joy and purpose`}
 
             {/* Binaural Volume */}
             <div className="space-y-3">
-              <Label>Binaural Volume: {form.watch("binaural_volume_db")} dB</Label>
+              <p id="binaural-volume-label" className="text-sm font-medium leading-none">
+                Binaural Volume: {form.watch("binaural_volume_db")} dB
+              </p>
               <Slider
+                name="binaural_volume_db"
+                aria-labelledby="binaural-volume-label"
                 value={[form.watch("binaural_volume_db")]}
                 onValueChange={([value]) => form.setValue("binaural_volume_db", value)}
                 min={-30}
@@ -522,10 +568,12 @@ My life is filled with joy and purpose`}
 
             {/* Voice Stability */}
             <div className="space-y-3">
-              <Label>
+              <p id="voice-stability-label" className="text-sm font-medium leading-none">
                 Voice Stability: {(form.watch("voice_stability") * 100).toFixed(0)}%
-              </Label>
+              </p>
               <Slider
+                name="voice_stability"
+                aria-labelledby="voice-stability-label"
                 value={[form.watch("voice_stability")]}
                 onValueChange={([value]) => form.setValue("voice_stability", value)}
                 min={0}
@@ -540,10 +588,12 @@ My life is filled with joy and purpose`}
 
             {/* Voice Similarity */}
             <div className="space-y-3">
-              <Label>
+              <p id="voice-similarity-label" className="text-sm font-medium leading-none">
                 Voice Similarity: {(form.watch("voice_similarity") * 100).toFixed(0)}%
-              </Label>
+              </p>
               <Slider
+                name="voice_similarity"
+                aria-labelledby="voice-similarity-label"
                 value={[form.watch("voice_similarity")]}
                 onValueChange={([value]) => form.setValue("voice_similarity", value)}
                 min={0}
@@ -565,14 +615,20 @@ My life is filled with joy and purpose`}
                 </div>
                 <Switch
                   id="lowpass"
+                  name="lowpass_enabled"
+                  aria-label="Low-pass Filter"
                   checked={form.watch("lowpass_enabled")}
                   onCheckedChange={(checked) => form.setValue("lowpass_enabled", checked)}
                 />
               </div>
               {form.watch("lowpass_enabled") && (
                 <div className="space-y-3 pl-4">
-                  <Label>Cutoff: {form.watch("lowpass_cutoff")} Hz</Label>
+                  <p id="lowpass-cutoff-label" className="text-sm font-medium leading-none">
+                    Cutoff: {form.watch("lowpass_cutoff")} Hz
+                  </p>
                   <Slider
+                    name="lowpass_cutoff"
+                    aria-labelledby="lowpass-cutoff-label"
                     value={[form.watch("lowpass_cutoff")]}
                     onValueChange={([value]) => form.setValue("lowpass_cutoff", value)}
                     min={2000}

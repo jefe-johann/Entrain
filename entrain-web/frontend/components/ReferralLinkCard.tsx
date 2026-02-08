@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Copy, Check } from "lucide-react";
 
@@ -13,6 +14,7 @@ interface ReferralLinkCardProps {
 
 export function ReferralLinkCard({ referralLink }: ReferralLinkCardProps) {
   const [copied, setCopied] = useState(false);
+  const referralInputId = "referral-share-link";
 
   const handleCopy = async () => {
     try {
@@ -32,7 +34,15 @@ export function ReferralLinkCard({ referralLink }: ReferralLinkCardProps) {
       </CardHeader>
       <CardContent>
         <div className="flex gap-2">
-          <Input value={referralLink} readOnly className="font-mono text-xs sm:text-sm" />
+          <Label htmlFor={referralInputId} className="sr-only">Referral link</Label>
+          <Input
+            id={referralInputId}
+            name="referral_link"
+            aria-label="Referral link"
+            value={referralLink}
+            readOnly
+            className="font-mono text-xs sm:text-sm"
+          />
           <Button onClick={handleCopy} className="shrink-0">
             {copied ? (
               <>

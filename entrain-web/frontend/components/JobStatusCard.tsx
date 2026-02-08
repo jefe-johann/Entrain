@@ -223,6 +223,8 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
             {isEditing ? (
               <input
                 ref={inputRef}
+                name="job_title"
+                aria-label="Track title"
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 onBlur={handleRename}
