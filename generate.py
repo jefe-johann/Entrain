@@ -136,7 +136,15 @@ def get_output_path(config):
     voice_name_or_id = config['tts']['elevenlabs']['voice_id']
     voice_id = resolve_voice_id(voice_name_or_id, config)
     voice_name = resolve_voice_name(voice_id, config)
-    filename = config['output']['filename']
+    raw_filename = str(config['output']['filename']).strip()
+    normalized_filename = raw_filename.replace("\\", "/")
+    filename = os.path.basename(normalized_filename)
+
+    if not filename:
+        raise ValueError("output.filename must include a valid file name")
+
+    if filename != raw_filename:
+        print(f"Note: Ignoring folder segments in output filename. Using: {filename}")
 
     # Create output directory structure
     output_dir = os.path.join("complete", voice_name)
