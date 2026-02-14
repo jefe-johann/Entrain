@@ -20,9 +20,8 @@ ENV/
 complete/
 
 # Personal config presets (keep only config.yaml for public sharing)
-config-presets/config-girlfriend.yaml
-config-presets/config-carey.yaml
-config-presets/config-riches.yaml
+config-presets/*
+!config-presets/config.yaml
 
 # OS
 .DS_Store
@@ -43,3 +42,4 @@ docs/
 node_modules/
 .next/
 *.tsbuildinfo
+

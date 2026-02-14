@@ -61,13 +61,24 @@ def generate_binaural_beat(
     # Process in 30-second chunks to stay under ~50 MB per chunk
     chunk_samples = sample_rate * 30
     amplitude = 32767 * 0.3
+    left_phase_step = (2 * np.pi * carrier_freq) / sample_rate
+    right_phase_step = (2 * np.pi * (carrier_freq + binaural_freq)) / sample_rate
+    left_phase = 0.0
+    right_phase = 0.0
 
     for start in range(0, total_samples, chunk_samples):
         end = min(start + chunk_samples, total_samples)
-        t = np.linspace(start / sample_rate, end / sample_rate, end - start, endpoint=False, dtype=np.float32)
+        chunk_len = end - start
+        sample_idx = np.arange(chunk_len, dtype=np.float64)
+        # Use float64 phase accumulation to avoid late-track float32 timestamp precision drift.
+        left_phase_chunk = left_phase + (sample_idx * left_phase_step)
+        right_phase_chunk = right_phase + (sample_idx * right_phase_step)
 
-        stereo[start:end, 0] = np.int16(np.sin(2 * np.pi * carrier_freq * t) * amplitude)
-        stereo[start:end, 1] = np.int16(np.sin(2 * np.pi * (carrier_freq + binaural_freq) * t) * amplitude)
+        stereo[start:end, 0] = np.int16(np.sin(left_phase_chunk) * amplitude)
+        stereo[start:end, 1] = np.int16(np.sin(right_phase_chunk) * amplitude)
+
+        left_phase = (left_phase + (chunk_len * left_phase_step)) % (2 * np.pi)
+        right_phase = (right_phase + (chunk_len * right_phase_step)) % (2 * np.pi)
 
     return stereo
 
