@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { api, Job, JobStatus } from "@/lib/api";
+import { api, Job } from "@/lib/api";
 import { formatBytes, formatDuration } from "@/lib/utils";
 
 interface JobStatusCardProps {
@@ -19,22 +19,34 @@ interface JobStatusCardProps {
   onComplete?: () => void;
 }
 
+function getFallbackTrackTitle(config: Job["config"]): string {
+  const voice = config.voice_id || "Track";
+  const duration = formatDuration(config.duration_minutes || 10);
+  return `${voice} - ${duration}`;
+}
+
+function getDisplayTrackTitle(config: Job["config"]): string {
+  const customTitle = config.title?.trim();
+  return customTitle ? customTitle : getFallbackTrackTitle(config);
+}
+
 export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive, onRegenerate, onComplete }: JobStatusCardProps) {
   const [job, setJob] = useState(initialJob);
   const [isPolling, setIsPolling] = useState(
     initialJob.status === "pending" || initialJob.status === "processing"
   );
   const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(initialJob.config.title || "");
+  const [editTitle, setEditTitle] = useState(getDisplayTrackTitle(initialJob.config));
   const inputRef = useRef<HTMLInputElement>(null);
 
   const canEdit = job.status === "completed" || job.status === "archived";
 
   const handleRename = async () => {
     const trimmed = editTitle.trim();
-    if (!trimmed || trimmed === (job.config.title || "")) {
+    const currentTitle = getDisplayTrackTitle(job.config);
+    if (!trimmed || trimmed === currentTitle) {
       setIsEditing(false);
-      setEditTitle(job.config.title || "");
+      setEditTitle(currentTitle);
       return;
     }
 
@@ -46,7 +58,7 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
       toast.success("Track renamed");
     } catch {
       toast.error("Failed to rename track");
-      setEditTitle(job.config.title || "");
+      setEditTitle(currentTitle);
     }
     setIsEditing(false);
   };
@@ -127,7 +139,7 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
       } else {
         // Fall back to default format
         const voice = config.voice_id || "unknown";
-        const duration = config.duration_minutes || 40;
+        const duration = config.duration_minutes || 10;
         link.download = `meditation-${voice}-${duration}min.flac`;
       }
 
@@ -201,7 +213,7 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
   const getExpiryText = () => {
     if (job.status !== "completed" || !job.completed_at) return null;
     const completedDate = new Date(job.completed_at);
-    const expiryDate = new Date(completedDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const expiryDate = new Date(completedDate.getTime() + 24 * 60 * 60 * 1000);
     const now = new Date();
     const daysLeft = Math.max(0, Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
     if (daysLeft <= 0) return "Auto-archives soon";
@@ -210,6 +222,8 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
 
   // Format config for display
   const config = job.config;
+  const displayTitle = getDisplayTrackTitle(config);
+  const hasCustomTitle = Boolean(config.title?.trim());
   const affirmationCount = Array.isArray(config.affirmations)
     ? config.affirmations.length
     : 0;
@@ -231,7 +245,7 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleRename();
                   if (e.key === "Escape") {
-                    setEditTitle(job.config.title || "");
+                    setEditTitle(displayTitle);
                     setIsEditing(false);
                   }
                 }}
@@ -241,9 +255,9 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
             ) : (
               <CardTitle
                 className={`text-lg ${canEdit ? "cursor-pointer hover:text-primary transition-colors group/title" : ""}`}
-                onClick={canEdit ? () => { setEditTitle(config.title || config.voice_id || ""); setIsEditing(true); } : undefined}
+                onClick={canEdit ? () => { setEditTitle(displayTitle); setIsEditing(true); } : undefined}
               >
-                <span>{config.title || config.voice_id} - {formatDuration(config.duration_minutes || 40)}</span>
+                <span>{displayTitle}</span>
                 {canEdit && (
                   <Pencil className="inline-block ml-1.5 h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover/title:opacity-100 transition-opacity" />
                 )}
@@ -256,7 +270,7 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
         </div>
         <CardDescription>
           {affirmationCount} affirmations, {config.binaural_preset || "theta"} wave
-          {config.title && ` • ${config.voice_id} voice`}
+          {hasCustomTitle && ` • ${config.voice_id} voice`}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -252,7 +252,7 @@ def generate_meditation(
     # Extract config values
     affirmations = config['affirmations']
     voice_name = config.get('voice_id', 'Rachel')
-    duration_minutes = config.get('duration_minutes', 40)
+    duration_minutes = config.get('duration_minutes', 10)
     binaural_frequency = config.get('binaural_frequency_hz')
 
     # Resolve binaural frequency from preset if not explicitly set

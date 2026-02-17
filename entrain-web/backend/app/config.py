@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     # Storage limits
     user_storage_limit_bytes: int = 250 * 1024 * 1024  # 250 MB
-    file_retention_days: int = 7
+    file_retention_days: int = 1
 
     # Stripe
     stripe_secret_key: str = ""

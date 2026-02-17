@@ -135,7 +135,7 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
       title: "",
       affirmations: "",
       voice_id: "Clara",
-      duration_minutes: 40,
+      duration_minutes: 10,
       binaural_preset: "theta",
       affirmation_volume_db: -15,
       binaural_volume_db: -12,

@@ -50,7 +50,7 @@ def download_file(
     # Generate filename for download
     config = job.config
     voice = config.get("voice_id", "unknown")
-    duration = config.get("duration_minutes", 40)
+    duration = config.get("duration_minutes", 10)
     filename = f"meditation-{voice}-{duration}min.flac"
 
     # For R2 storage, redirect to presigned URL
