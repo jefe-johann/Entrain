@@ -141,7 +141,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
 
         <section id="recommended-products-mid" className="mt-10 rounded-xl border border-border/70 bg-background/80 p-5">
-          <h2 className="text-2xl font-semibold tracking-tight">Recommended Reishi Products</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">{post.recommendedProductsHeading}</h2>
           <p className="mt-2 text-xs text-muted-foreground">
             Disclosure: links below may be affiliate links.
           </p>
@@ -210,7 +210,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
 
         <section id="recommended-products" className="mt-10 rounded-xl border border-border/70 bg-background/80 p-5">
-          <h2 className="text-2xl font-semibold tracking-tight">Recommended Reishi Products</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">{post.recommendedProductsHeading}</h2>
 
           <div className="mt-5 grid gap-4 md:grid-cols-3">
             {productCards.map((product) => (
