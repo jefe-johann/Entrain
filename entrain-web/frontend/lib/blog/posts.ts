@@ -35,6 +35,239 @@ export interface BlogPost {
 
 const blogPosts: BlogPost[] = [
   {
+    slug: "bacopa-monnieri-benefits-memory-focus-cognitive-calm",
+    title: "Bacopa Monnieri for Memory and Cognitive Calm: A Smarter Long-Game Herb",
+    excerpt:
+      "Bacopa monnieri is less about instant stimulation and more about cumulative mental performance. Here is how people use it to improve memory retention, reduce cognitive noise, and stay clear under pressure.",
+    heroSummary:
+      "If you want sharper recall and steadier thinking, Bacopa is one of the most practical herbs to test. It usually works as a long-game support: better learning retention, calmer overthinking, and more stable focus when your schedule is mentally demanding.",
+    publishedAt: "2026-02-13",
+    updatedAt: "2026-02-13",
+    readTimeMinutes: 9,
+    category: "Herbs & Supplements",
+    tags: ["bacopa monnieri", "memory", "focus", "cognitive health", "brahmi"],
+    seoTitle: "Bacopa Monnieri for Memory, Focus, and Cognitive Calm | Entrain Blog",
+    seoDescription:
+      "Learn how Bacopa Monnieri can support memory consolidation, learning retention, and calmer cognition. Includes practical use guidance and product recommendations.",
+    affiliateDisclosure:
+      "Some links in this article are affiliate links. If you buy through them, we may earn a commission at no extra cost to you.",
+    medicalDisclaimer:
+      "This content is for educational purposes only and is not medical advice. Bacopa may interact with medications or health conditions. Speak with a licensed clinician before starting any supplement.",
+    recommendedProductsHeading: "Recommended Bacopa Monnieri Products",
+    sections: [
+      {
+        id: "what-makes-bacopa-different",
+        heading: "What Makes Bacopa Different from Other Focus Supplements",
+        paragraphs: [
+          "Bacopa monnieri has a different profile than quick-hit nootropics. Most users do not describe a dramatic first-dose boost. Instead, they report gradual gains in recall quality, mental organization, and cognitive composure over weeks.",
+          "That difference matters. If your goal is sustainable performance, the long-game pattern can be an advantage because it fits repeatable routines instead of short bursts. Bacopa is often used for building capacity, not chasing stimulation.",
+          "A useful expectation is subtle daily improvements that become obvious in hindsight: fewer memory blanks, easier concept retrieval, and less mental fragmentation during busy days.",
+        ],
+      },
+      {
+        id: "memory-consolidation-and-learning-retention",
+        heading: "Memory Consolidation and Learning Retention",
+        paragraphs: [
+          "The strongest reason people choose Bacopa is memory support. In practice, this often shows up as better retention of what you studied, read, or rehearsed instead of that information fading quickly.",
+          "This is especially useful if your goals depend on repeated learning cycles, such as skill building, exam prep, content creation, or high-volume decision work. Better consolidation means less relearning and smoother momentum.",
+          "Think of Bacopa as support for the quality of your mental storage, not just momentary concentration.",
+        ],
+        bulletPoints: [
+          "Often used for stronger recall after repeated learning sessions",
+          "Can reduce the need to constantly re-study the same material",
+          "Supports long-term consistency more than short-term stimulation",
+        ],
+      },
+      {
+        id: "cognitive-calm-under-pressure",
+        heading: "Cognitive Calm Under Pressure",
+        paragraphs: [
+          "Another practical benefit is calmer cognition under load. When stress rises, thinking often becomes noisy and reactive. Users who respond well to Bacopa commonly report less internal clutter and steadier reasoning.",
+          "That calm can improve working memory because fewer stress-driven interruptions compete for attention. You still need good sleep and routines, but reduced cognitive turbulence can make those routines easier to execute.",
+          "For many people, this is where Bacopa earns its value: not flashy energy, but cleaner thinking when the day is demanding.",
+        ],
+      },
+      {
+        id: "bacopa-for-mental-routines",
+        heading: "Using Bacopa in Mental Performance Routines",
+        paragraphs: [
+          "Bacopa fits best in systems that already value consistency. It pairs well with structured study blocks, daily review, journaling, and reflection practices where memory quality compounds results over time.",
+          "If you use manifestation scripting or affirmation writing, Bacopa can be helpful indirectly by improving cognitive steadiness and reducing scattered thought patterns. That makes repetition feel more deliberate and less mechanical.",
+          "Use one stable routine for a few weeks before deciding whether it is helping. Constant stack changes make it hard to evaluate signal.",
+        ],
+      },
+      {
+        id: "simple-bacopa-protocol",
+        heading: "A Simple Bacopa Protocol",
+        paragraphs: [
+          "Run a two-to-four-week trial with stable timing. Keep your sleep schedule, workload pattern, and tracking method as consistent as possible so changes are easier to interpret.",
+          "Avoid over-tracking. A few useful indicators tell you most of what you need to know.",
+        ],
+        bulletPoints: [
+          "Take Bacopa daily according to the product label",
+          "Anchor it to the same meal or time window each day",
+          "Track memory slips, recall speed, and focus stability",
+          "Review trends weekly instead of chasing day-to-day fluctuations",
+          "Keep caffeine and late-night screen habits reasonably stable",
+        ],
+      },
+      {
+        id: "safety-and-selection-bacopa",
+        heading: "Safety and Product Selection",
+        paragraphs: [
+          "Quality control matters with herbal products. Choose options with clear labeling, transparent sourcing, and straightforward dosing guidance.",
+          "If you are pregnant, breastfeeding, taking prescription medications, or managing chronic conditions, check with your clinician before using Bacopa.",
+          "Supplements are support layers. The biggest gains still come from foundational habits: sleep quality, review-based learning, movement, and consistent practice.",
+        ],
+      },
+    ],
+    affiliateProducts: [
+      {
+        id: "amazon-himalaya-bacopa",
+        name: "Himalaya Bacopa Monnieri",
+        reason: "A straightforward capsule option for daily Bacopa use.",
+        href: "https://www.amazon.com/Himalaya-Monnieri-Supplement-Nootropic-Enhanced/dp/B0006NZPGA/ref=sr_1_1",
+        imageUrl: "https://m.media-amazon.com/images/I/81vPvysqEEL._AC_SL1500_.jpg",
+        cta: "View on Amazon",
+      },
+      {
+        id: "nootropics-depot-cognance-bacopa",
+        name: "Nootropics Depot Cognance Enhanced Bacopa Capsules",
+        reason: "A specialized Bacopa capsule option from a nootropics-focused retailer.",
+        href: "https://nootropicsdepot.com/cognance-enhanced-bacopa-capsules/",
+        cta: "View on Nootropics Depot",
+      },
+      {
+        id: "etsy-brahmi-bacopa-tincture",
+        name: "Etsy Brahmi (Bacopa Monnieri) Tincture",
+        reason: "Useful for people who prefer a tincture format over capsules.",
+        href: "https://www.etsy.com/listing/1503422727/tincture-brahmi-bacopa-monnieri",
+        imageUrl: "https://i.etsystatic.com/22264500/r/il/a68610/5048510719/il_1588xN.5048510719_epyg.jpg",
+        cta: "View on Etsy",
+      },
+    ],
+  },
+  {
+    slug: "neville-goddard-state-akin-to-sleep-binaural-audio-for-manifestation",
+    title: "Neville Goddard's State Akin to Sleep: Binaural Audio for Manifestation Work",
+    excerpt:
+      "Neville Goddard taught SATS (State Akin to Sleep) as one of the most effective windows for impressing a new assumption. Here is how binaural audio can help you enter SATS more consistently and make imaginal scenes feel more real.",
+    heroSummary:
+      "If you struggle to hold a vivid imaginal act before sleep, SATS is the state to train. The goal is relaxed drowsiness with clear awareness. Binaural audio can help many people reduce mental noise, stabilize attention, and stay in that receptive window long enough for manifestation practice to compound.",
+    publishedAt: "2026-02-12",
+    updatedAt: "2026-02-12",
+    readTimeMinutes: 9,
+    category: "Manifestation",
+    tags: ["neville goddard", "sats", "binaural beats", "manifestation", "imaginal acts"],
+    seoTitle: "Neville Goddard SATS and Binaural Audio for Manifestation | Entrain Blog",
+    seoDescription:
+      "Learn Neville Goddard's SATS method and how binaural audio can support focus, receptivity, and stronger imaginal scenes before sleep. Includes practical routine guidance and recommended books.",
+    affiliateDisclosure:
+      "Some links in this article are affiliate links. If you buy through them, we may earn a commission at no extra cost to you.",
+    medicalDisclaimer:
+      "This content is for educational and spiritual self-development purposes only and is not medical or mental health advice. Do not use binaural audio while driving or operating machinery.",
+    recommendedProductsHeading: "Recommended Neville Goddard Books",
+    sections: [
+      {
+        id: "what-is-state-akin-to-sleep",
+        heading: "What Neville Meant by State Akin to Sleep (SATS)",
+        paragraphs: [
+          "In Neville Goddard's teaching, SATS is the drowsy borderland between wakefulness and sleep where the mind is relaxed but still impressionable. You are not fully unconscious and not in high-alert thinking mode either. That middle state is where imaginal scenes can feel more natural and emotionally real.",
+          "Most people fail here because they either stay too mentally active or pass out too quickly. SATS is not about forcing concentration. It is about soft focus, lowered effort, and repeating one fulfilled scene until it feels familiar.",
+          "Neville emphasized feeling the wish fulfilled. SATS gives that feeling better conditions because resistance tends to drop as the body settles.",
+        ],
+      },
+      {
+        id: "why-sats-is-powerful-for-manifestation",
+        heading: "Why SATS Is Powerful for Manifestation",
+        paragraphs: [
+          "SATS works like a state-training window. During the day, old assumptions and environmental triggers can dominate your attention. At night, as you become drowsy, those filters often soften and your chosen inner scene is easier to accept.",
+          "That is why short, repeated scenes tend to outperform long complicated visualizations. A simple loop that implies completion can be replayed without strain, and repetition is what builds familiarity.",
+          "Think in terms of identity conditioning, not one-night intensity. The question is whether your nightly state keeps affirming the old story or the new one.",
+        ],
+        bulletPoints: [
+          "Lower mental resistance compared with high-stress daytime sessions",
+          "Better emotional absorption of a single fulfilled outcome",
+          "Compounds over time when the same scene is repeated consistently",
+        ],
+      },
+      {
+        id: "how-binaural-audio-helps-sats",
+        heading: "How Binaural Audio Can Help You Enter SATS",
+        paragraphs: [
+          "Binaural audio can act as a state cue. When used at low volume in a calm setting, it helps many users settle attention and reduce random thought switching before sleep.",
+          "The point is not to chase a specific frequency number or treat audio as magic. The point is making state entry easier. If the track helps you relax faster and stay with your imaginal loop longer, it is doing its job.",
+          "Used consistently, the same audio can become part of your ritual signal: headphones on, lights low, body still, scene begins. That predictability is useful for manifestation practice.",
+        ],
+      },
+      {
+        id: "simple-sats-binaural-routine",
+        heading: "A Simple SATS + Binaural Routine",
+        paragraphs: [
+          "Keep the protocol minimal for two to three weeks so you can evaluate what is actually helping. Do not switch tracks, techniques, and scene scripts every night.",
+          "Choose one fulfilled scene of 5 to 10 seconds. Loop it with the same sensory details and emotional tone until you drift toward sleep.",
+        ],
+        bulletPoints: [
+          "30 to 45 minutes before bed: reduce bright screens and stimulation",
+          "Set binaural audio to low comfortable volume",
+          "Relax the body with slow nasal breathing for 3 to 5 minutes",
+          "Replay one short scene that implies your desire is already done",
+          "Use first-person perspective and include a natural confirming detail",
+          "If thoughts drift, gently return to the same scene without judgment",
+        ],
+      },
+      {
+        id: "scene-design-for-feeling-it-real",
+        heading: "Designing an Imaginal Scene That Feels Real",
+        paragraphs: [
+          "A good SATS scene is short, specific, and end-focused. Instead of imagining the whole process, imagine one moment that could only happen if your desire were already fulfilled.",
+          "Examples include reading a message of congratulations, hearing a trusted friend confirm your result, or seeing your new bank balance while feeling relief. Keep the scene ordinary and believable to your nervous system.",
+          "Emotion should be quiet but definite: gratitude, relief, confidence, or calm certainty. You are training familiarity with the fulfilled identity, not forcing excitement.",
+        ],
+      },
+      {
+        id: "common-mistakes-and-better-expectations",
+        heading: "Common SATS Mistakes and Better Expectations",
+        paragraphs: [
+          "The most common mistake is technique-hopping. People change methods every few days and never build enough repetition for one pattern to imprint. Pick one scene and run it consistently before judging.",
+          "Another mistake is treating SATS as a control mechanism for exact timing. A better approach is state consistency: nightly practice, emotional steadiness, and aligned daytime behavior.",
+          "Binaural audio is a support layer, not the core driver. Your results come from repeated assumption plus lived congruence over time.",
+        ],
+        bulletPoints: [
+          "Do not rewrite your scene every night unless it is clearly not resonating",
+          "Avoid checking for signs every hour after practice",
+          "Measure progress by state stability and consistency first",
+        ],
+      },
+    ],
+    affiliateProducts: [
+      {
+        id: "amazon-neville-modern-master-collection",
+        name: "Neville Collection: 4 Books in 1 (Modern Master)",
+        reason: "A practical bundle for reading Neville's core methods in one place.",
+        href: "https://www.amazon.com/Neville-Collection-Books-Modern-Master/dp/B09S19JLSP/ref=sr_1_2",
+        imageUrl: "https://m.media-amazon.com/images/I/81FVIyVQo4L._SL1500_.jpg",
+        cta: "View on Amazon",
+      },
+      {
+        id: "amazon-neville-complete-collection",
+        name: "Neville Goddard Complete Collection 1939-1961",
+        reason: "Best for deeper study across lectures and writings over multiple years.",
+        href: "https://www.amazon.com/Neville-Goddard-Complete-Collection-1939-1961/dp/B0FNY51Q9F/ref=sr_1_9",
+        imageUrl: "https://m.media-amazon.com/images/I/81PaCMkZFsL._SL1499_.jpg",
+        cta: "View on Amazon",
+      },
+      {
+        id: "amazon-feeling-is-the-secret",
+        name: "Neville Goddard's Feeling Is the Secret",
+        reason: "A short foundational read focused on feeling and assumption.",
+        href: "https://www.amazon.com/Neville-Goddards-Feeling-Secret-Thoughts/dp/1729597831/ref=sr_1_31",
+        imageUrl: "https://m.media-amazon.com/images/I/515ZasEGiiL.jpg",
+        cta: "View on Amazon",
+      },
+    ],
+  },
+  {
     slug: "tulsi-holy-basil-benefits-for-mental-clarity-stress-and-meditation",
     title: "Tulsi and the Alert-Calm State: A Holy Basil Guide for Meditation",
     excerpt:
@@ -44,7 +277,7 @@ const blogPosts: BlogPost[] = [
     publishedAt: "2026-02-11",
     updatedAt: "2026-02-11",
     readTimeMinutes: 8,
-    category: "Supplements & Practice",
+    category: "Herbs & Supplements",
     tags: ["tulsi", "holy basil", "meditation", "affirmations", "stress support"],
     seoTitle: "Tulsi and the Alert-Calm State for Meditation | Entrain Blog",
     seoDescription:
@@ -159,7 +392,7 @@ const blogPosts: BlogPost[] = [
     publishedAt: "2026-02-10",
     updatedAt: "2026-02-10",
     readTimeMinutes: 8,
-    category: "Supplements & Practice",
+    category: "Herbs & Supplements",
     tags: ["gotu kola", "mental clarity", "meditation", "affirmations", "adaptogens"],
     seoTitle: "Gotu Kola for Focus and Stress Support | Entrain Blog",
     seoDescription:
@@ -274,7 +507,7 @@ const blogPosts: BlogPost[] = [
     publishedAt: "2026-02-09",
     updatedAt: "2026-02-09",
     readTimeMinutes: 8,
-    category: "Supplements & Practice",
+    category: "Herbs & Supplements",
     tags: ["schisandra", "mental clarity", "meditation", "affirmations", "adaptogens"],
     seoTitle: "Schisandra for Cognitive Endurance and Meditation Flow | Entrain Blog",
     seoDescription:
@@ -389,7 +622,7 @@ const blogPosts: BlogPost[] = [
     publishedAt: "2026-02-08",
     updatedAt: "2026-02-08",
     readTimeMinutes: 8,
-    category: "Supplements & Practice",
+    category: "Herbs & Supplements",
     tags: ["reishi", "meditation", "subliminals", "mental wellness", "adaptogens"],
     seoTitle: "Reishi for Evening Reset and Meditation Depth | Entrain Blog",
     seoDescription:
