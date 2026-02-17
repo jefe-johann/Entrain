@@ -1,6 +1,7 @@
 import { auth, signIn } from "@/auth";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Waves, MessageSquareText, Mic, Headphones, PenLine, Sparkles, Download, ChevronDown } from "lucide-react";
@@ -23,6 +24,11 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
     redirect("/generate");
   }
 
+  const signInWithGoogle = async () => {
+    "use server";
+    await signIn("google", { redirectTo: signInRedirectPath });
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Atmospheric background */}
@@ -36,8 +42,39 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
       </div>
 
       <div className="relative z-10">
+        <header className="border-b border-border/40 bg-background/75 backdrop-blur-md">
+          <div className="container mx-auto flex items-center justify-between px-4 py-3">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <Image
+                src="/logo.png"
+                alt="Entrain Logo"
+                width={32}
+                height={32}
+                className="transition-transform group-hover:scale-105"
+              />
+              <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-purple-700 to-violet-600 bg-clip-text text-transparent">
+                Entrain
+              </span>
+            </Link>
+
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link
+                href="/blog"
+                className="rounded-md px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary/70"
+              >
+                Blog
+              </Link>
+              <form action={signInWithGoogle}>
+                <Button type="submit" size="sm" className="rounded-lg">
+                  Sign in
+                </Button>
+              </form>
+            </div>
+          </div>
+        </header>
+
         {/* Hero Section */}
-        <section className="pt-20 pb-8 px-4">
+        <section className="pt-14 sm:pt-16 pb-8 px-4">
           <div className="container mx-auto max-w-5xl text-center">
             {/* Logo with glow */}
             <div className="flex justify-center mb-8 animate-fade-in-up">
@@ -71,12 +108,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
 
             {/* CTA Button */}
             <div className="animate-fade-in-up-delay-4 mt-10">
-              <form
-                action={async () => {
-                  "use server";
-                  await signIn("google", { redirectTo: signInRedirectPath });
-                }}
-              >
+              <form action={signInWithGoogle}>
                 <Button
                   type="submit"
                   size="lg"
@@ -216,13 +248,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="relative z-10 pb-8">
-                <form
-                  action={async () => {
-                    "use server";
-                    await signIn("google", { redirectTo: signInRedirectPath });
-                  }}
-                  className="flex flex-col items-center"
-                >
+                <form action={signInWithGoogle} className="flex flex-col items-center">
                   <Button
                     type="submit"
                     size="lg"
