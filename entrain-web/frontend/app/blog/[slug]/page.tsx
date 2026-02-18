@@ -90,6 +90,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       };
     }),
   );
+  const hasAffiliateProducts = productCards.length > 0;
   const midpoint = Math.ceil(post.sections.length / 2);
   const firstHalfSections = post.sections.slice(0, midpoint);
   const secondHalfSections = post.sections.slice(midpoint);
@@ -140,49 +141,51 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           ))}
         </div>
 
-        <section id="recommended-products-mid" className="mt-10 rounded-xl border border-border/70 bg-background/80 p-5">
-          <h2 className="text-2xl font-semibold tracking-tight">{post.recommendedProductsHeading}</h2>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Disclosure: links below may be affiliate links.
-          </p>
+        {hasAffiliateProducts ? (
+          <section id="recommended-products-mid" className="mt-10 rounded-xl border border-border/70 bg-background/80 p-5">
+            <h2 className="text-2xl font-semibold tracking-tight">{post.recommendedProductsHeading}</h2>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Disclosure: links below may be affiliate links.
+            </p>
 
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
-            {productCards.map((product) => (
-              <article key={`${product.id}-mid`} className="rounded-lg border border-border/70 bg-card p-4">
-                {product.resolvedImageUrl ? (
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              {productCards.map((product) => (
+                <article key={`${product.id}-mid`} className="rounded-lg border border-border/70 bg-card p-4">
+                  {product.resolvedImageUrl ? (
+                    <a
+                      href={product.href}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow sponsored"
+                      className="block overflow-hidden rounded-md border border-border/70"
+                    >
+                      <img
+                        src={product.resolvedImageUrl}
+                        alt={`${product.name} product image`}
+                        loading="lazy"
+                        className="h-40 w-full bg-white object-contain p-2"
+                        referrerPolicy="no-referrer"
+                      />
+                    </a>
+                  ) : null}
+
+                  <h3 className={`text-lg font-semibold leading-snug ${product.resolvedImageUrl ? "mt-3" : ""}`}>
+                    {product.name}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{product.reason}</p>
                   <a
                     href={product.href}
                     target="_blank"
                     rel="noopener noreferrer nofollow sponsored"
-                    className="block overflow-hidden rounded-md border border-border/70"
+                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-purple-700"
                   >
-                    <img
-                      src={product.resolvedImageUrl}
-                      alt={`${product.name} product image`}
-                      loading="lazy"
-                      className="h-40 w-full bg-white object-contain p-2"
-                      referrerPolicy="no-referrer"
-                    />
+                    {product.cta}
+                    <ExternalLink className="h-4 w-4" />
                   </a>
-                ) : null}
-
-                <h3 className={`text-lg font-semibold leading-snug ${product.resolvedImageUrl ? "mt-3" : ""}`}>
-                  {product.name}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{product.reason}</p>
-                <a
-                  href={product.href}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow sponsored"
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-purple-700"
-                >
-                  {product.cta}
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </article>
-            ))}
-          </div>
-        </section>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <div className="mt-8 space-y-8">
           {secondHalfSections.map((section) => (
@@ -209,52 +212,54 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           ))}
         </div>
 
-        <section id="recommended-products" className="mt-10 rounded-xl border border-border/70 bg-background/80 p-5">
-          <h2 className="text-2xl font-semibold tracking-tight">{post.recommendedProductsHeading}</h2>
+        {hasAffiliateProducts ? (
+          <section id="recommended-products" className="mt-10 rounded-xl border border-border/70 bg-background/80 p-5">
+            <h2 className="text-2xl font-semibold tracking-tight">{post.recommendedProductsHeading}</h2>
 
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
-            {productCards.map((product) => (
-              <article key={product.id} className="rounded-lg border border-border/70 bg-card p-4">
-                {product.resolvedImageUrl ? (
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {productCards.map((product) => (
+                <article key={product.id} className="rounded-lg border border-border/70 bg-card p-4">
+                  {product.resolvedImageUrl ? (
+                    <a
+                      href={product.href}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow sponsored"
+                      className="block overflow-hidden rounded-md border border-border/70"
+                    >
+                      <img
+                        src={product.resolvedImageUrl}
+                        alt={`${product.name} product image`}
+                        loading="lazy"
+                        className="h-40 w-full bg-white object-contain p-2"
+                        referrerPolicy="no-referrer"
+                      />
+                    </a>
+                  ) : null}
+
+                  <h3 className={`text-lg font-semibold leading-snug ${product.resolvedImageUrl ? "mt-3" : ""}`}>
+                    {product.name}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{product.reason}</p>
                   <a
                     href={product.href}
                     target="_blank"
                     rel="noopener noreferrer nofollow sponsored"
-                    className="block overflow-hidden rounded-md border border-border/70"
+                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-purple-700"
                   >
-                    <img
-                      src={product.resolvedImageUrl}
-                      alt={`${product.name} product image`}
-                      loading="lazy"
-                      className="h-40 w-full bg-white object-contain p-2"
-                      referrerPolicy="no-referrer"
-                    />
+                    {product.cta}
+                    <ExternalLink className="h-4 w-4" />
                   </a>
-                ) : null}
+                </article>
+              ))}
+            </div>
 
-                <h3 className={`text-lg font-semibold leading-snug ${product.resolvedImageUrl ? "mt-3" : ""}`}>
-                  {product.name}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{product.reason}</p>
-                <a
-                  href={product.href}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow sponsored"
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-purple-700"
-                >
-                  {product.cta}
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </article>
-            ))}
-          </div>
-
-          <AffiliateDisclosure
-            className="mt-5"
-            affiliateDisclosure={post.affiliateDisclosure}
-            medicalDisclaimer={post.medicalDisclaimer}
-          />
-        </section>
+            <AffiliateDisclosure
+              className="mt-5"
+              affiliateDisclosure={post.affiliateDisclosure}
+              medicalDisclaimer={post.medicalDisclaimer}
+            />
+          </section>
+        ) : null}
 
         <div className="mt-8 border-t border-border/70 pt-6">
           <p className="text-sm text-muted-foreground">
