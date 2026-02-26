@@ -1,11 +1,12 @@
 import { auth, signIn } from "@/auth";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Waves, MessageSquareText, Mic, Headphones, PenLine, Sparkles, Download, ChevronDown } from "lucide-react";
-import { normalizeReferralCode } from "@/lib/referrals";
+import { captureReferralClick, normalizeReferralCode } from "@/lib/referrals";
 
 interface LandingPageProps {
   searchParams: Promise<{ ref?: string | string[] }>;
@@ -17,6 +18,26 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
   const signInRedirectPath = referralCode
     ? `/generate?ref=${encodeURIComponent(referralCode)}`
     : "/generate";
+
+  if (referralCode) {
+    try {
+      const requestHeaders = await headers();
+      const forwardedFor = requestHeaders.get("x-forwarded-for");
+      const ipAddress =
+        forwardedFor?.split(",")[0]?.trim() ?? requestHeaders.get("x-real-ip");
+
+      await captureReferralClick({
+        referrerUserId: referralCode,
+        landingPath: "/",
+        userAgent: requestHeaders.get("user-agent"),
+        referer: requestHeaders.get("referer"),
+        ipAddress,
+      });
+    } catch (error) {
+      console.error("Failed to capture referral click:", error);
+    }
+  }
+
   const session = await auth();
 
   // If user is already signed in, redirect to generate page

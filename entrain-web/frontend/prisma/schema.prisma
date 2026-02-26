@@ -26,6 +26,8 @@ model User {
   payments Payment[]
   referralsSent ReferralSignup[] @relation("Referrer")
   referralReceived ReferralSignup? @relation("Referred")
+  referralEventsAsReferrer ReferralEvent[] @relation("ReferralEventReferrer")
+  referralEventsAsReferred ReferralEvent[] @relation("ReferralEventReferred")
   customVoices     CustomVoice[]
 
   @@map("users")
@@ -108,6 +110,7 @@ model Payment {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   referralRewards ReferralSignup[]
+  referralEvents ReferralEvent[]
 
   @@index([userId])
   @@map("payments")
@@ -128,6 +131,38 @@ model ReferralSignup {
   @@index([referrerUserId])
   @@index([rewardedAt])
   @@map("referral_signups")
+}
+
+enum ReferralEventType {
+  CLICK
+  SIGNUP_ATTRIBUTED
+  REWARD_GRANTED
+  REWARD_REVERSED
+}
+
+model ReferralEvent {
+  id             String            @id @default(uuid())
+  referrerUserId String            @map("referrer_user_id")
+  referredUserId String?           @map("referred_user_id")
+  paymentId      String?           @map("payment_id")
+  eventType      ReferralEventType @map("event_type")
+  eventReason    String?           @map("event_reason")
+  ipHash         String?           @map("ip_hash")
+  userAgent      String?           @map("user_agent") @db.Text
+  referer        String?           @db.Text
+  landingPath    String?           @map("landing_path")
+  createdAt      DateTime          @default(now()) @map("created_at")
+
+  referrer User @relation("ReferralEventReferrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
+  referred User? @relation("ReferralEventReferred", fields: [referredUserId], references: [id], onDelete: SetNull)
+  payment Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@index([referrerUserId, eventType])
+  @@index([referredUserId])
+  @@index([paymentId])
+  @@index([createdAt])
+  @@index([ipHash])
+  @@map("referral_events")
 }
 
 model CustomVoice {

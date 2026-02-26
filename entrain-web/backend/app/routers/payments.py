@@ -8,11 +8,13 @@ from datetime import datetime, timezone
 
 from ..database import get_db
 from ..config import get_settings
-from ..models import User, Payment, ReferralSignup
+from ..models import User, Payment, ReferralSignup, ReferralEvent
 from ..schemas.payment import CheckoutSessionCreate, CheckoutSessionResponse
 
 router = APIRouter(prefix="/api/payments", tags=["payments"])
 logger = logging.getLogger(__name__)
+REFERRAL_EVENT_REWARD_GRANTED = "REWARD_GRANTED"
+REFERRAL_EVENT_REWARD_REVERSED = "REWARD_REVERSED"
 
 
 def get_current_user_email(x_user_email: Optional[str] = Header(None)) -> str:
@@ -202,6 +204,14 @@ def _apply_referral_reward_if_eligible(purchased_user: User, payment: Payment, d
         return
 
     referrer.credits += 1
+    db.add(
+        ReferralEvent(
+            event_type=REFERRAL_EVENT_REWARD_GRANTED,
+            referrer_user_id=referral.referrer_user_id,
+            referred_user_id=referral.referred_user_id,
+            payment_id=payment.id,
+        )
+    )
     logger.info(
         f"Awarded 1 referral credit to {referrer.email} for first purchase by {purchased_user.email}"
     )
@@ -278,6 +288,16 @@ def _reverse_referral_reward_for_payment(payment: Payment, reason: str, db: Sess
 
     referral.reward_payment_id = None
     referral.rewarded_at = None
+    if referrer:
+        db.add(
+            ReferralEvent(
+                event_type=REFERRAL_EVENT_REWARD_REVERSED,
+                referrer_user_id=referral.referrer_user_id,
+                referred_user_id=referral.referred_user_id,
+                payment_id=payment.id,
+                event_reason=reason,
+            )
+        )
     logger.info(
         f"Reversed referral credit for referral {referral.id} because of {reason} on payment {payment.id}"
     )
