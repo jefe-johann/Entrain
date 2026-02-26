@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
@@ -58,6 +59,13 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
             </div>
             <p className="text-muted-foreground ml-[52px]">
               Configure your personalized track with binaural beats and spoken affirmations.
+            </p>
+            <p className="text-xs text-muted-foreground/90 ml-[52px] mt-1">
+              Need help? Check out our{" "}
+              <Link href="/config-notes" className="text-purple-700 hover:underline dark:text-purple-300">
+                Affirmation Tips
+              </Link>
+              .
             </p>
           </div>
 

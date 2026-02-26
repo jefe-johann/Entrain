@@ -14,6 +14,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ELEVENLABS_LABEL,
+  ELEVENLABS_URL,
+  LIBRARY_VOICE_HELPER_PREFIX,
+  LIBRARY_VOICE_HELPER_SUFFIX,
+  VOICE_CLONE_INTRO_TEXT,
+  VOICE_CLONE_STEPS,
+} from "@/lib/customVoiceGuide";
 
 interface AddCustomVoiceDialogProps {
   open: boolean;
@@ -122,16 +130,16 @@ export function AddCustomVoiceDialog({
 
           <TabsContent value="library" className="space-y-3 pt-1">
             <p className="text-xs text-muted-foreground">
-              Browse voices at{" "}
+              {LIBRARY_VOICE_HELPER_PREFIX}{" "}
               <a
-                href="https://try.elevenlabs.io/dzno4ab4ajsy"
+                href={ELEVENLABS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-purple-600 hover:underline"
               >
-                ElevenLabs
+                {ELEVENLABS_LABEL}
               </a>
-              , copy the Voice ID, and enter it below.
+              {LIBRARY_VOICE_HELPER_SUFFIX}
             </p>
             <div className="space-y-2">
               <Label htmlFor="lib-name">Display Name</Label>
@@ -167,24 +175,28 @@ export function AddCustomVoiceDialog({
 
           <TabsContent value="clone" className="space-y-3 pt-1">
             <div className="text-xs text-muted-foreground space-y-1">
-              <p>To create a voice clone:</p>
+              <p>{VOICE_CLONE_INTRO_TEXT}</p>
               <ol className="list-decimal list-inside space-y-0.5 pl-1">
-                <li>
-                  Sign up at{" "}
-                  <a
-                    href="https://try.elevenlabs.io/dzno4ab4ajsy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-purple-600 hover:underline"
-                  >
-                    ElevenLabs
-                  </a>{" "}
-                  (Starter plan required)
-                </li>
-                <li>Go to VoiceLab &gt; Instant Voice Cloning</li>
-                <li>Upload 1-3 min of clean audio of your voice</li>
-                <li>Copy Voice ID from My Voices (three dots menu)</li>
-                <li>Copy API Key from Developers (left sidebar) &gt; API Keys</li>
+                {VOICE_CLONE_STEPS.map((step, index) => (
+                  <li key={`voice-clone-step-${index}`}>
+                    {"text" in step ? (
+                      step.text
+                    ) : (
+                      <>
+                        {step.beforeLink}
+                        <a
+                          href={ELEVENLABS_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-600 hover:underline"
+                        >
+                          {ELEVENLABS_LABEL}
+                        </a>
+                        {step.afterLink}
+                      </>
+                    )}
+                  </li>
+                ))}
               </ol>
             </div>
             <div className="space-y-2">
