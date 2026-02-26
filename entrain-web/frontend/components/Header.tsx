@@ -23,6 +23,7 @@ interface HeaderProps {
 export function Header({ credits, isAdmin }: HeaderProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuContentId = "mobile-nav-menu-dialog";
 
   const navItems = [
     { href: "/generate", label: "Generate" },
@@ -93,7 +94,10 @@ export function Header({ credits, isAdmin }: HeaderProps) {
               <Menu className="h-5 w-5" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="left-auto right-0 top-0 h-screen h-dvh w-[85vw] max-w-sm translate-x-0 translate-y-0 gap-6 rounded-none border-l border-border/60 p-5 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right">
+          <DialogContent
+            id={mobileMenuContentId}
+            className="left-auto right-0 top-0 h-screen h-dvh w-[85vw] max-w-sm translate-x-0 translate-y-0 gap-6 rounded-none border-l border-border/60 p-5 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right"
+          >
             <DialogTitle className="sr-only">Navigation Menu</DialogTitle>
             <DialogDescription className="sr-only">
               Access navigation links, credit balance, and account actions.

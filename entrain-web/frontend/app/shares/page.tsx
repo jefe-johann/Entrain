@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { ReferralLinkCard } from "@/components/ReferralLinkCard";
+import { SocialShareCard } from "@/components/SocialShareCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Gift, Share2, Clock3 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
@@ -98,6 +99,8 @@ export default async function SharesPage() {
                 </CardContent>
               </Card>
             </div>
+
+            <SocialShareCard referralLink={referralLink} />
           </div>
         </main>
       </div>

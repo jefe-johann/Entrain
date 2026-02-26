@@ -331,10 +331,14 @@ My life is filled with joy and purpose`}
               .split("\n")
               .map((line: string) => line.trim())
               .filter((line: string) => line.length > 0).length;
-            const total = count * repetitions;
+            const creditsRequired = Math.max(
+              1,
+              Math.ceil((count * repetitions) / AFFIRMATIONS_PER_CREDIT)
+            );
             return (
               <p className="text-sm text-muted-foreground">
-                {count} affirmation{count !== 1 ? "s" : ""} x {repetitions} repetition{repetitions !== 1 ? "s" : ""} = {total} / {AFFIRMATIONS_PER_CREDIT} per credit
+                Current cost: {creditsRequired} credit(s) | {AFFIRMATIONS_PER_CREDIT} affirmations per credit :)
+                {/* | Current affirmations = {total}, from {count} affirmations x {repetitions} repetitions */}
               </p>
             );
           })()}

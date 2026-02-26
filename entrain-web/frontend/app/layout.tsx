@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     siteName: "Entrain",
     images: [
       {
-        url: "/og-image.webp",
-        width: 1200,
-        height: 630,
-        alt: "Entrain - Meditation Track Generator",
+        url: "/entrain-share.png",
+        width: 480,
+        height: 359,
+        alt: "Entrain share preview",
       },
     ],
     locale: "en_US",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Entrain - Meditation Track Generator",
     description: "Create personalized meditation tracks with binaural beats and spoken affirmations",
-    images: ["/og-image.webp"],
+    images: ["/entrain-share.png"],
   },
   icons: {
     icon: "/favicon.ico",
