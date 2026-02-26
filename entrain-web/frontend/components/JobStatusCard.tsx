@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Download, Loader2, CheckCircle, XCircle, Clock, Archive, RefreshCw, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,7 +16,6 @@ interface JobStatusCardProps {
   userEmail: string;
   onDelete?: () => void;
   onArchive?: (archivedJob: Job) => void;
-  onRegenerate?: (newJob: Job) => void;
   onComplete?: () => void;
 }
 
@@ -30,7 +30,8 @@ function getDisplayTrackTitle(config: Job["config"]): string {
   return customTitle ? customTitle : getFallbackTrackTitle(config);
 }
 
-export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive, onRegenerate, onComplete }: JobStatusCardProps) {
+export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive, onComplete }: JobStatusCardProps) {
+  const router = useRouter();
   const [job, setJob] = useState(initialJob);
   const [isPolling, setIsPolling] = useState(
     initialJob.status === "pending" || initialJob.status === "processing"
@@ -182,15 +183,28 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
     }
   };
 
-  const handleRegenerate = async () => {
-    try {
-      api.setUserEmail(userEmail);
-      const newJob = await api.regenerateJob(job.id);
-      toast.success("Regeneration started!");
-      onRegenerate?.(newJob);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to regenerate");
+  const handleRegenerate = () => {
+    const config = job.config;
+    const params = new URLSearchParams();
+
+    if (config.title) params.set("title", config.title);
+    if (config.affirmations?.length) params.set("affirmations", config.affirmations.join("\n"));
+    if (config.voice_id) params.set("voice_id", config.voice_id);
+    if (config.duration_minutes != null) params.set("duration_minutes", String(config.duration_minutes));
+    if (config.binaural_preset) params.set("binaural_preset", config.binaural_preset);
+    if (config.affirmation_volume_db != null) params.set("affirmation_volume_db", String(config.affirmation_volume_db));
+    if (config.binaural_volume_db != null) params.set("binaural_volume_db", String(config.binaural_volume_db));
+    if (config.voice_settings?.stability != null) params.set("voice_stability", String(config.voice_settings.stability));
+    if (config.voice_settings?.similarity_boost != null) params.set("voice_similarity", String(config.voice_settings.similarity_boost));
+    if (config.lowpass_filter?.enabled != null) params.set("lowpass_enabled", String(config.lowpass_filter.enabled));
+    if (config.lowpass_filter?.cutoff_hz != null) params.set("lowpass_cutoff", String(config.lowpass_filter.cutoff_hz));
+    if (config.repetitions != null) params.set("repetitions", String(config.repetitions));
+    if (config.background_noise) {
+      params.set("background_noise_type", config.background_noise.type);
+      params.set("background_noise_volume_db", String(config.background_noise.volume_db));
     }
+
+    router.push(`/generate?${params.toString()}`);
   };
 
   const statusIcon: Record<Job["status"], React.ReactNode> = {
@@ -206,7 +220,7 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
     processing: job.progress_message || "Processing...",
     completed: "Ready to download",
     failed: job.error_message || "Generation failed",
-    archived: "Archived - config saved for regeneration",
+    archived: "Archived - settings archived for regeneration",
   };
 
   // Compute days until auto-archive for completed jobs
@@ -303,7 +317,7 @@ export function JobStatusCard({ job: initialJob, userEmail, onDelete, onArchive,
         {/* Archived */}
         {job.status === "archived" && (
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Config saved for regeneration</p>
+            <p className="text-sm text-muted-foreground">Settings archived for regeneration</p>
             <Button variant="outline" onClick={handleRegenerate}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Regenerate

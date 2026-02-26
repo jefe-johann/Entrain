@@ -63,11 +63,6 @@ export function DashboardClient({ userEmail }: DashboardClientProps) {
     refreshStorage();
   };
 
-  const handleRegenerate = (newJob: Job) => {
-    setJobs((prev) => [newJob, ...prev]);
-    refreshStorage();
-  };
-
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-3">
@@ -117,7 +112,6 @@ export function DashboardClient({ userEmail }: DashboardClientProps) {
             userEmail={userEmail}
             onDelete={() => handleDelete(job.id)}
             onArchive={handleArchive}
-            onRegenerate={handleRegenerate}
             onComplete={refreshStorage}
           />
         </div>

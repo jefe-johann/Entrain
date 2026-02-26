@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
@@ -62,11 +63,13 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
 
           <Card className="max-w-3xl mx-auto border-0 shadow-lg bg-white/80 backdrop-blur-sm">
             <CardContent className="pt-6">
-              <GeneratorForm
-                userEmail={session.user.email!}
-                credits={session.user.credits}
-                isAdmin={session.user.isAdmin}
-              />
+              <Suspense>
+                <GeneratorForm
+                  userEmail={session.user.email!}
+                  credits={session.user.credits}
+                  isAdmin={session.user.isAdmin}
+                />
+              </Suspense>
             </CardContent>
           </Card>
         </main>

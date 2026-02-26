@@ -25,6 +25,7 @@ AUDIO_LOOP_FILES = {
     'small-waves': 'small-waves.mp3',
     'ocean-waves': 'ocean-waves.mp3',
     'river': 'river.mp3',
+    'singing-bowl': 'singing-bowl.mp3',
 }
 
 

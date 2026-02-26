@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -62,12 +62,29 @@ const formSchema = z.object({
   voice_similarity: z.number().min(0).max(1),
   lowpass_enabled: z.boolean(),
   lowpass_cutoff: z.number().min(2000).max(8000),
-  background_noise_type: z.enum(["none", "pink", "brown", "rain", "small-waves", "ocean-waves", "river"]),
+  background_noise_type: z.enum(["none", "pink", "brown", "rain", "small-waves", "ocean-waves", "river", "singing-bowl"]),
   background_noise_volume_db: z.number().min(-40).max(0),
   repetitions: z.number().min(1).max(10),
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+const FORM_DEFAULTS: FormValues = {
+  title: "",
+  affirmations: "",
+  voice_id: "Clara",
+  duration_minutes: 10,
+  binaural_preset: "theta",
+  affirmation_volume_db: -15,
+  binaural_volume_db: -12,
+  voice_stability: 0.8,
+  voice_similarity: 0.75,
+  lowpass_enabled: false,
+  lowpass_cutoff: 3750,
+  background_noise_type: "none",
+  background_noise_volume_db: -14,
+  repetitions: 1,
+};
 
 interface GeneratorFormProps {
   userEmail: string;
@@ -86,6 +103,7 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
 
 export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [voices, setVoices] = useState<Voice[]>(FALLBACK_VOICES);
@@ -131,25 +149,54 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
     }
   };
 
+  // Parse URL search params for pre-filling (used by Regenerate from dashboard)
+  const initialValues = useMemo((): FormValues => {
+    if (!searchParams.has("affirmations")) return FORM_DEFAULTS;
+
+    const p = (key: string) => searchParams.get(key);
+    const pNum = (key: string) => {
+      const v = p(key);
+      return v != null ? Number(v) : undefined;
+    };
+
+    return {
+      title: p("title") || FORM_DEFAULTS.title,
+      affirmations: p("affirmations") || FORM_DEFAULTS.affirmations,
+      voice_id: p("voice_id") || FORM_DEFAULTS.voice_id,
+      duration_minutes: pNum("duration_minutes") ?? FORM_DEFAULTS.duration_minutes,
+      binaural_preset: (p("binaural_preset") as FormValues["binaural_preset"]) || FORM_DEFAULTS.binaural_preset,
+      affirmation_volume_db: pNum("affirmation_volume_db") ?? FORM_DEFAULTS.affirmation_volume_db,
+      binaural_volume_db: pNum("binaural_volume_db") ?? FORM_DEFAULTS.binaural_volume_db,
+      voice_stability: pNum("voice_stability") ?? FORM_DEFAULTS.voice_stability,
+      voice_similarity: pNum("voice_similarity") ?? FORM_DEFAULTS.voice_similarity,
+      lowpass_enabled: p("lowpass_enabled") === "true" ? true : p("lowpass_enabled") === "false" ? false : FORM_DEFAULTS.lowpass_enabled,
+      lowpass_cutoff: pNum("lowpass_cutoff") ?? FORM_DEFAULTS.lowpass_cutoff,
+      background_noise_type: (p("background_noise_type") as FormValues["background_noise_type"]) || FORM_DEFAULTS.background_noise_type,
+      background_noise_volume_db: pNum("background_noise_volume_db") ?? FORM_DEFAULTS.background_noise_volume_db,
+      repetitions: pNum("repetitions") ?? FORM_DEFAULTS.repetitions,
+    };
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      affirmations: "",
-      voice_id: "Clara",
-      duration_minutes: 10,
-      binaural_preset: "theta",
-      affirmation_volume_db: -15,
-      binaural_volume_db: -12,
-      voice_stability: 0.8,
-      voice_similarity: 0.75,
-      lowpass_enabled: false,
-      lowpass_cutoff: 3750,
-      background_noise_type: "none",
-      background_noise_volume_db: -14,
-      repetitions: 1,
-    },
+    defaultValues: initialValues,
   });
+
+  // If pre-filled from URL: auto-open advanced settings if needed, then clean URL
+  useEffect(() => {
+    if (!searchParams.has("affirmations")) return;
+
+    const hasAdvanced =
+      initialValues.affirmation_volume_db !== FORM_DEFAULTS.affirmation_volume_db ||
+      initialValues.binaural_volume_db !== FORM_DEFAULTS.binaural_volume_db ||
+      initialValues.voice_stability !== FORM_DEFAULTS.voice_stability ||
+      initialValues.voice_similarity !== FORM_DEFAULTS.voice_similarity ||
+      initialValues.lowpass_enabled !== FORM_DEFAULTS.lowpass_enabled ||
+      initialValues.lowpass_cutoff !== FORM_DEFAULTS.lowpass_cutoff;
+    if (hasAdvanced) setAdvancedOpen(true);
+
+    window.history.replaceState(null, "", "/generate");
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = async (values: FormValues) => {
     const affirmationCount = values.affirmations
@@ -210,7 +257,7 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
         },
         repetitions: values.repetitions,
         background_noise: values.background_noise_type !== "none"
-          ? { type: values.background_noise_type as "pink" | "brown" | "rain" | "small-waves" | "ocean-waves" | "river", volume_db: values.background_noise_volume_db }
+          ? { type: values.background_noise_type as "pink" | "brown" | "rain" | "small-waves" | "ocean-waves" | "river" | "singing-bowl", volume_db: values.background_noise_volume_db }
           : undefined,
         use_user_api_key: selectedCustomVoice?.use_user_api_key ?? false,
       };
@@ -516,7 +563,7 @@ My life is filled with joy and purpose`}
               <Select
                 name="background_noise_type"
                 value={form.watch("background_noise_type")}
-                onValueChange={(value: "none" | "pink" | "brown" | "rain" | "small-waves" | "ocean-waves" | "river") =>
+                onValueChange={(value: "none" | "pink" | "brown" | "rain" | "small-waves" | "ocean-waves" | "river" | "singing-bowl") =>
                   form.setValue("background_noise_type", value)
                 }
               >
@@ -531,6 +578,7 @@ My life is filled with joy and purpose`}
                   <SelectItem value="small-waves">Small Waves</SelectItem>
                   <SelectItem value="ocean-waves">Ocean Waves</SelectItem>
                   <SelectItem value="river">River</SelectItem>
+                  <SelectItem value="singing-bowl">Singing Bowl</SelectItem>
                 </SelectContent>
               </Select>
             </div>

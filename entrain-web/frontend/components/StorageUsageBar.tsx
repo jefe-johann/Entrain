@@ -45,7 +45,7 @@ export function StorageUsageBar({ storageInfo }: StorageUsageBarProps) {
             </>
           ) : (
             <>
-              Files auto-delete after 1 day. Download your tracks to keep them
+              Files auto-archive after 2 days. Download your tracks to keep them
               forever!
             </>
           )}

@@ -39,6 +39,7 @@ class NoiseType(str, Enum):
     SMALL_WAVES = "small-waves"
     OCEAN_WAVES = "ocean-waves"
     RIVER = "river"
+    SINGING_BOWL = "singing-bowl"
 
 
 class BackgroundNoise(BaseModel):

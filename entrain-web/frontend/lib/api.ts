@@ -47,7 +47,7 @@ interface JobConfig {
   };
   repetitions?: number;
   background_noise?: {
-    type: "pink" | "brown" | "rain" | "small-waves" | "ocean-waves" | "river";
+    type: "pink" | "brown" | "rain" | "small-waves" | "ocean-waves" | "river" | "singing-bowl";
     volume_db: number;
   };
   use_user_api_key?: boolean;
