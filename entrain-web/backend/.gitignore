@@ -17,6 +17,7 @@ generated_files/
 *.flac
 *.wav
 *.mp3
+!worker/assets/*.mp3
 
 # IDE
 .idea/
