@@ -62,6 +62,8 @@ const formSchema = z.object({
   voice_similarity: z.number().min(0).max(1),
   lowpass_enabled: z.boolean(),
   lowpass_cutoff: z.number().min(2000).max(8000),
+  background_noise_type: z.enum(["none", "pink", "brown"]),
+  background_noise_volume_db: z.number().min(-40).max(0),
   repetitions: z.number().min(1).max(10),
 });
 
@@ -143,6 +145,8 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
       voice_similarity: 0.75,
       lowpass_enabled: false,
       lowpass_cutoff: 3750,
+      background_noise_type: "none",
+      background_noise_volume_db: -20,
       repetitions: 1,
     },
   });
@@ -205,6 +209,9 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
           cutoff_hz: values.lowpass_cutoff,
         },
         repetitions: values.repetitions,
+        background_noise: values.background_noise_type !== "none"
+          ? { type: values.background_noise_type, volume_db: values.background_noise_volume_db }
+          : undefined,
         use_user_api_key: selectedCustomVoice?.use_user_api_key ?? false,
       };
 
@@ -498,6 +505,52 @@ My life is filled with joy and purpose`}
               );
             })()}
           </div>
+
+          {/* Background Noise */}
+          <div className="space-y-4 md:col-span-2">
+            <div className="flex items-center justify-between rounded-lg bg-secondary/40 px-4 py-3">
+              <div>
+                <p className="text-sm font-medium leading-none">Background Noise</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Adds ambient noise layer behind binaural beat</p>
+              </div>
+              <Select
+                name="background_noise_type"
+                value={form.watch("background_noise_type")}
+                onValueChange={(value: "none" | "pink" | "brown") =>
+                  form.setValue("background_noise_type", value)
+                }
+              >
+                <SelectTrigger className="w-[140px] bg-white/60" aria-label="Background noise type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="pink">Pink Noise</SelectItem>
+                  <SelectItem value="brown">Brown Noise</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {form.watch("background_noise_type") !== "none" && (
+              <div className="space-y-3 pl-4">
+                <p id="noise-volume-label" className="text-sm font-medium leading-none">
+                  Noise Volume: {form.watch("background_noise_volume_db")} dB
+                </p>
+                <Slider
+                  name="background_noise_volume_db"
+                  aria-labelledby="noise-volume-label"
+                  value={[form.watch("background_noise_volume_db")]}
+                  onValueChange={([value]) => form.setValue("background_noise_volume_db", value)}
+                  min={-40}
+                  max={0}
+                  step={1}
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>-40 dB</span>
+                  <span>0 dB</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -642,6 +695,7 @@ My life is filled with joy and purpose`}
                 </div>
               )}
             </div>
+
           </div>
         </CollapsibleContent>
       </Collapsible>

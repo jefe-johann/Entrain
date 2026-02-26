@@ -46,6 +46,10 @@ interface JobConfig {
     cutoff_hz?: number;
   };
   repetitions?: number;
+  background_noise?: {
+    type: "pink" | "brown";
+    volume_db: number;
+  };
   use_user_api_key?: boolean;
 }
 

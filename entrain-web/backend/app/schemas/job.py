@@ -32,6 +32,18 @@ class LowpassFilter(BaseModel):
     cutoff_hz: int = Field(default=3750, ge=2000, le=8000)
 
 
+class NoiseType(str, Enum):
+    PINK = "pink"
+    BROWN = "brown"
+
+
+class BackgroundNoise(BaseModel):
+    """Background noise settings."""
+
+    type: NoiseType = NoiseType.PINK
+    volume_db: float = Field(default=-20, ge=-40, le=0)
+
+
 class JobConfig(BaseModel):
     """Configuration for a generation job."""
 
@@ -51,6 +63,7 @@ class JobConfig(BaseModel):
     voice_settings: VoiceSettings = Field(default_factory=VoiceSettings)
     lowpass_filter: LowpassFilter = Field(default_factory=LowpassFilter)
     repetitions: int = Field(default=1, ge=1, le=10)
+    background_noise: Optional[BackgroundNoise] = None
     use_user_api_key: bool = False
 
     def credits_required(self) -> int:

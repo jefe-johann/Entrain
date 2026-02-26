@@ -8,7 +8,7 @@ Based on the original generate.py, modified to:
 
 import numpy as np
 from scipy.io import wavfile
-from scipy.signal import butter, filtfilt
+from scipy.signal import butter, filtfilt, lfilter
 import soundfile as sf
 import os
 import tempfile
@@ -48,11 +48,43 @@ def apply_lowpass_filter(audio_data, cutoff_hz: int, sample_rate: int, order: in
     return filtered_data.astype(np.int16)
 
 
+def generate_pink_noise_chunk(num_samples: int, rng: np.random.Generator) -> np.ndarray:
+    """Generate pink noise using FFT spectral shaping (1/sqrt(f) filter)."""
+    white = rng.standard_normal(num_samples)
+    fft = np.fft.rfft(white)
+    freqs = np.fft.rfftfreq(num_samples, d=1.0)
+    # Avoid division by zero at DC; leave DC component as-is
+    freqs[0] = 1.0
+    fft *= 1.0 / np.sqrt(freqs)
+    pink = np.fft.irfft(fft, n=num_samples)
+    # Normalize to [-1, 1]
+    peak = np.max(np.abs(pink))
+    if peak > 0:
+        pink /= peak
+    return pink
+
+
+def generate_brown_noise_chunk(num_samples: int, rng: np.random.Generator) -> np.ndarray:
+    """Generate brown noise using a leaky integrator (1/f² spectrum)."""
+    white = rng.standard_normal(num_samples)
+    # Leaky integrator: H(z) = 1 / (1 - 0.98·z⁻¹)
+    # Gives the ~-6 dB/octave rolloff characteristic of brown noise
+    # while keeping energy in the audible range
+    brown = lfilter([1], [1, -0.98], white)
+    # Normalize to [-1, 1]
+    peak = np.max(np.abs(brown))
+    if peak > 0:
+        brown /= peak
+    return brown
+
+
 def generate_binaural_beat(
     duration_seconds: int,
     sample_rate: int,
     carrier_freq: int,
     binaural_freq: float,
+    noise_type: Optional[str] = None,
+    noise_volume_db: float = -20,
 ) -> np.ndarray:
     """Generate stereo binaural beat audio in chunks to limit memory usage."""
     total_samples = int(sample_rate * duration_seconds)
@@ -66,6 +98,15 @@ def generate_binaural_beat(
     left_phase = 0.0
     right_phase = 0.0
 
+    # Set up noise generator if requested
+    noise_generators = {
+        'pink': generate_pink_noise_chunk,
+        'brown': generate_brown_noise_chunk,
+    }
+    noise_gen_fn = noise_generators.get(noise_type) if noise_type else None
+    noise_amplitude = 32767 * (10 ** (noise_volume_db / 20)) if noise_gen_fn else 0
+    rng = np.random.default_rng(seed=42) if noise_gen_fn else None
+
     for start in range(0, total_samples, chunk_samples):
         end = min(start + chunk_samples, total_samples)
         chunk_len = end - start
@@ -74,8 +115,17 @@ def generate_binaural_beat(
         left_phase_chunk = left_phase + (sample_idx * left_phase_step)
         right_phase_chunk = right_phase + (sample_idx * right_phase_step)
 
-        stereo[start:end, 0] = np.int16(np.sin(left_phase_chunk) * amplitude)
-        stereo[start:end, 1] = np.int16(np.sin(right_phase_chunk) * amplitude)
+        left = np.sin(left_phase_chunk) * amplitude
+        right = np.sin(right_phase_chunk) * amplitude
+
+        # Mix in background noise (same noise in both channels for spatial consistency)
+        if noise_gen_fn and rng is not None:
+            noise_chunk = noise_gen_fn(chunk_len, rng) * noise_amplitude
+            left += noise_chunk
+            right += noise_chunk
+
+        stereo[start:end, 0] = np.clip(left, -32767, 32767).astype(np.int16)
+        stereo[start:end, 1] = np.clip(right, -32767, 32767).astype(np.int16)
 
         left_phase = (left_phase + (chunk_len * left_phase_step)) % (2 * np.pi)
         right_phase = (right_phase + (chunk_len * right_phase_step)) % (2 * np.pi)
@@ -272,6 +322,7 @@ def generate_meditation(
     voice_settings = config.get('voice_settings', {})
     lowpass_config = config.get('lowpass_filter', {'enabled': True, 'cutoff_hz': 3750})
     repetitions = config.get('repetitions', 1)
+    background_noise = config.get('background_noise')
 
     sample_rate = DEFAULT_SAMPLE_RATE
     duration_seconds = duration_minutes * 60
@@ -291,6 +342,8 @@ def generate_meditation(
         sample_rate,
         DEFAULT_CARRIER_FREQ,
         binaural_frequency,
+        noise_type=background_noise['type'] if background_noise else None,
+        noise_volume_db=background_noise.get('volume_db', -20) if background_noise else -20,
     )
 
     if progress_callback:
