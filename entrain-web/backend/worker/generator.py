@@ -17,6 +17,16 @@ from elevenlabs import ElevenLabs, VoiceSettings
 import subprocess
 from typing import Callable, Optional
 
+ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
+
+# Maps noise type keys to asset filenames
+AUDIO_LOOP_FILES = {
+    'rain': 'rain-loop.mp3',
+    'small-waves': 'small-waves.mp3',
+    'ocean-waves': 'ocean-waves.mp3',
+    'river': 'river.mp3',
+}
+
 
 # Voice ID mappings (same as original config)
 VOICES = {
@@ -78,6 +88,32 @@ def generate_brown_noise_chunk(num_samples: int, rng: np.random.Generator) -> np
     return brown
 
 
+def load_audio_loop(filename: str, sample_rate: int) -> np.ndarray:
+    """Decode an audio file from assets, resample to sample_rate, return normalized float64 array.
+
+    Returns just the loop itself — callers use modulo indexing to avoid tiling in memory.
+    """
+    src_path = os.path.join(ASSETS_DIR, filename)
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmp:
+        wav_path = tmp.name
+    try:
+        subprocess.run([
+            'ffmpeg', '-i', src_path,
+            '-ar', str(sample_rate),
+            '-ac', '1',
+            '-y', wav_path,
+        ], check=True, capture_output=True)
+        _, audio = wavfile.read(wav_path)
+        audio = audio.astype(np.float64)
+        peak = np.max(np.abs(audio))
+        if peak > 0:
+            audio /= peak
+        return audio
+    finally:
+        if os.path.exists(wav_path):
+            os.unlink(wav_path)
+
+
 def generate_binaural_beat(
     duration_seconds: int,
     sample_rate: int,
@@ -98,14 +134,20 @@ def generate_binaural_beat(
     left_phase = 0.0
     right_phase = 0.0
 
-    # Set up noise generator if requested
-    noise_generators = {
+    # Set up noise source
+    noise_amplitude = 32767 * (10 ** (noise_volume_db / 20)) if noise_type else 0
+    procedural_generators = {
         'pink': generate_pink_noise_chunk,
         'brown': generate_brown_noise_chunk,
     }
-    noise_gen_fn = noise_generators.get(noise_type) if noise_type else None
-    noise_amplitude = 32767 * (10 ** (noise_volume_db / 20)) if noise_gen_fn else 0
+    noise_gen_fn = procedural_generators.get(noise_type) if noise_type else None
     rng = np.random.default_rng(seed=42) if noise_gen_fn else None
+    # Load file-based loop if needed (just the loop itself, not tiled — we use modulo per chunk)
+    loop_filename = AUDIO_LOOP_FILES.get(noise_type) if noise_type else None
+    audio_loop = load_audio_loop(loop_filename, sample_rate) if loop_filename else None
+
+    # Fade duration: 3s at each end of the track to smooth the repeat transition
+    fade_samples = sample_rate * 3
 
     for start in range(0, total_samples, chunk_samples):
         end = min(start + chunk_samples, total_samples)
@@ -118,9 +160,24 @@ def generate_binaural_beat(
         left = np.sin(left_phase_chunk) * amplitude
         right = np.sin(right_phase_chunk) * amplitude
 
-        # Mix in background noise (same noise in both channels for spatial consistency)
+        # Mix in background noise (same signal in both channels for spatial consistency)
         if noise_gen_fn and rng is not None:
             noise_chunk = noise_gen_fn(chunk_len, rng) * noise_amplitude
+        elif audio_loop is not None:
+            # Modulo indexing wraps the loop without tiling the full track in memory
+            indices = np.arange(start, end) % len(audio_loop)
+            noise_chunk = audio_loop[indices] * noise_amplitude
+        else:
+            noise_chunk = None
+
+        if noise_chunk is not None:
+            # Fade in/out envelope so ambient layer doesn't cut abruptly at track boundaries
+            positions = np.arange(start, end, dtype=np.float64)
+            gain = np.ones(chunk_len)
+            gain = np.where(positions < fade_samples, positions / fade_samples, gain)
+            gain = np.where(positions >= total_samples - fade_samples,
+                            (total_samples - positions) / fade_samples, gain)
+            noise_chunk *= gain
             left += noise_chunk
             right += noise_chunk
 
@@ -343,7 +400,7 @@ def generate_meditation(
         DEFAULT_CARRIER_FREQ,
         binaural_frequency,
         noise_type=background_noise['type'] if background_noise else None,
-        noise_volume_db=background_noise.get('volume_db', -20) if background_noise else -20,
+        noise_volume_db=background_noise.get('volume_db', -14) if background_noise else -14,
     )
 
     if progress_callback:

@@ -62,7 +62,7 @@ const formSchema = z.object({
   voice_similarity: z.number().min(0).max(1),
   lowpass_enabled: z.boolean(),
   lowpass_cutoff: z.number().min(2000).max(8000),
-  background_noise_type: z.enum(["none", "pink", "brown"]),
+  background_noise_type: z.enum(["none", "pink", "brown", "rain", "small-waves", "ocean-waves", "river"]),
   background_noise_volume_db: z.number().min(-40).max(0),
   repetitions: z.number().min(1).max(10),
 });
@@ -146,7 +146,7 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
       lowpass_enabled: false,
       lowpass_cutoff: 3750,
       background_noise_type: "none",
-      background_noise_volume_db: -20,
+      background_noise_volume_db: -14,
       repetitions: 1,
     },
   });
@@ -210,7 +210,7 @@ export function GeneratorForm({ userEmail, credits, isAdmin }: GeneratorFormProp
         },
         repetitions: values.repetitions,
         background_noise: values.background_noise_type !== "none"
-          ? { type: values.background_noise_type, volume_db: values.background_noise_volume_db }
+          ? { type: values.background_noise_type as "pink" | "brown" | "rain" | "small-waves" | "ocean-waves" | "river", volume_db: values.background_noise_volume_db }
           : undefined,
         use_user_api_key: selectedCustomVoice?.use_user_api_key ?? false,
       };
@@ -516,7 +516,7 @@ My life is filled with joy and purpose`}
               <Select
                 name="background_noise_type"
                 value={form.watch("background_noise_type")}
-                onValueChange={(value: "none" | "pink" | "brown") =>
+                onValueChange={(value: "none" | "pink" | "brown" | "rain" | "small-waves" | "ocean-waves" | "river") =>
                   form.setValue("background_noise_type", value)
                 }
               >
@@ -527,6 +527,10 @@ My life is filled with joy and purpose`}
                   <SelectItem value="none">None</SelectItem>
                   <SelectItem value="pink">Pink Noise</SelectItem>
                   <SelectItem value="brown">Brown Noise</SelectItem>
+                  <SelectItem value="rain">Rain</SelectItem>
+                  <SelectItem value="small-waves">Small Waves</SelectItem>
+                  <SelectItem value="ocean-waves">Ocean Waves</SelectItem>
+                  <SelectItem value="river">River</SelectItem>
                 </SelectContent>
               </Select>
             </div>

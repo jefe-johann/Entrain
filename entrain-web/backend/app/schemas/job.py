@@ -35,13 +35,17 @@ class LowpassFilter(BaseModel):
 class NoiseType(str, Enum):
     PINK = "pink"
     BROWN = "brown"
+    RAIN = "rain"
+    SMALL_WAVES = "small-waves"
+    OCEAN_WAVES = "ocean-waves"
+    RIVER = "river"
 
 
 class BackgroundNoise(BaseModel):
     """Background noise settings."""
 
     type: NoiseType = NoiseType.PINK
-    volume_db: float = Field(default=-20, ge=-40, le=0)
+    volume_db: float = Field(default=-14, ge=-40, le=0)
 
 
 class JobConfig(BaseModel):
