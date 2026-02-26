@@ -35,6 +35,214 @@ export interface BlogPost {
 
 const blogPosts: BlogPost[] = [
   {
+    slug: "affirmation-tips-binaural-guide-for-manifestation",
+    title: "Affirmation Tips and Binaural Audio: A Practical Guide for Better Results",
+    excerpt:
+      "A clear affirmation framework plus the right binaural setup can improve consistency and depth. Here is how to choose frequencies, phrasing, and voice style for stronger daily practice.",
+    heroSummary:
+      "This guide repurposes our in-app affirmation tips into a practical blog format. It covers the core science behind binaural beats, frequency selection, affirmation grammar, and voice choice, then combines everything into a simple routine you can repeat daily.",
+    publishedAt: "2026-02-23",
+    updatedAt: "2026-02-23",
+    readTimeMinutes: 9,
+    category: "Manifestation",
+    tags: ["affirmations", "binaural beats", "manifestation", "meditation", "self concept"],
+    seoTitle: "Affirmation Tips and Binaural Guide for Manifestation | Entrain Blog",
+    seoDescription:
+      "Learn practical affirmation tips with binaural audio: how the science works, which frequencies to use, and how phrasing and voice choice affect your results.",
+    affiliateDisclosure:
+      "Some links in this article are affiliate links. If you buy through them, we may earn a commission at no extra cost to you.",
+    medicalDisclaimer:
+      "This content is for educational purposes only and is not medical advice. Do not use binaural audio while driving or operating machinery.",
+    recommendedProductsHeading: "Recommended Tools and Reading",
+    sections: [
+      {
+        id: "science-of-binaural-audio",
+        heading: "The Science: How Binaural Audio Works",
+        paragraphs: [
+          "Binaural beats are an auditory illusion created by sending slightly different tones to each ear. Your brain perceives the frequency difference as a rhythmic pulse.",
+          "Example: if one ear receives 200 Hz and the other receives 205 Hz, the perceived beat is 5 Hz. This effect requires stereo headphones so each ear gets a separate signal.",
+          "The underlying mechanism is often described as frequency-following response, where rhythmic input can support shifts in attention and perceived state.",
+        ],
+      },
+      {
+        id: "frequency-guide-for-state-selection",
+        heading: "Frequency Guide: Choosing the Right Hz",
+        paragraphs: [
+          "Different binaural frequencies are commonly associated with different use cases. The goal is not perfection on day one, but finding a repeatable setting that improves your routine quality.",
+        ],
+        bulletPoints: [
+          "2 Hz (Delta): deep sleep and recovery-oriented sessions",
+          "4 Hz (Theta/Delta border): twilight state and deeper internal work",
+          "6 Hz (Theta): visualization, emotional processing, and absorbent learning",
+          "10 Hz (Alpha): relaxed focus, stress reduction, and daytime clarity",
+        ],
+      },
+      {
+        id: "affirmation-grammar-and-belief",
+        heading: "Affirmation Grammar: First, Second, or Third Person",
+        paragraphs: [
+          "How you phrase affirmations changes how the message lands psychologically. Different pronouns can reduce resistance or increase emotional ownership depending on your current state.",
+          "First person (\"I am\") often creates stronger embodiment but can trigger pushback if it feels too far from your baseline. Second person (\"You are\") can feel like supportive coaching and helps during effortful phases. Third person (using your name) can create distance during high anxiety and reduce emotional reactivity.",
+          "Use whichever framing allows consistency without internal argument. Stable repetition beats dramatic intensity.",
+        ],
+      },
+      {
+        id: "voice-choice-self-vs-external",
+        heading: "Voice Choice: Your Voice vs External Voice",
+        paragraphs: [
+          "Your own voice can increase self-relevance and familiarity, which often helps messages feel personally integrated. For many users, this lowers skepticism because it resembles internal self-talk.",
+          "External voices can still be useful. A calm authoritative tone can hold attention and counter harsh internal narratives, especially when users are rebuilding emotional safety.",
+          "Test both approaches for one to two weeks each. Keep all other variables stable and compare adherence plus felt response.",
+        ],
+      },
+      {
+        id: "headphones-and-setup-rules",
+        heading: "Setup Rules That Matter Most",
+        paragraphs: [
+          "The biggest technical miss is skipping headphones. Without stereo separation, true binaural effects are reduced or removed.",
+          "Keep volume comfortable, avoid constant track switching, and run sessions in consistent time windows. These basics outperform complicated stack changes.",
+        ],
+        bulletPoints: [
+          "Always use stereo headphones for binaural sessions",
+          "Keep playback at low-to-moderate volume",
+          "Use one frequency protocol for at least 7 days",
+          "Track state quality, not just mood spikes",
+        ],
+      },
+      {
+        id: "quick-start-affirmation-routine",
+        heading: "Quick Start Routine",
+        paragraphs: [
+          "Use this simple sequence to combine audio + affirmations with minimal friction.",
+        ],
+        bulletPoints: [
+          "Put on stereo headphones",
+          "Start with 6 Hz if your goal is deep reprogramming and visualization",
+          "Choose \"You are\" phrasing if you need support; choose \"I am\" if you can hold full ownership",
+          "Close your eyes, regulate breathing, and loop your statements for 10 to 15 minutes",
+        ],
+      },
+    ],
+    affiliateProducts: [
+      {
+        id: "amazon-sleeping-noise-cancelling-earbuds-affirmation-guide",
+        name: "Sleeping Noise-Cancelling Earbuds",
+        reason: "Low-profile headphone option for consistent binaural listening.",
+        href: "https://amzn.to/4aAHjMG",
+        imageUrl: "https://m.media-amazon.com/images/I/51h2hWEcU0L._AC_SL1500_.jpg",
+        cta: "View on Amazon",
+      },
+      {
+        id: "amazon-neville-collection-affirmation-guide",
+        name: "Neville Collection: 4 Books in 1",
+        reason: "Reference reading for state and imagination-based manifestation methods.",
+        href: "https://amzn.to/40kCQJ6",
+        imageUrl: "https://m.media-amazon.com/images/I/81FVIyVQo4L._SL1500_.jpg",
+        cta: "View on Amazon",
+      },
+      {
+        id: "amazon-reishi-option-affirmation-guide",
+        name: "Reishi Supplement Option",
+        reason: "Commonly used in evening wind-down routines before inner work.",
+        href: "https://amzn.to/4ao0V7T",
+        imageUrl: "https://m.media-amazon.com/images/I/71Qy9i2p2pL._SL1500_.jpg",
+        cta: "View on Amazon",
+      },
+    ],
+  },
+  {
+    slug: "pink-noise-vs-white-noise-vs-brown-noise-for-meditation-and-focus",
+    title: "Pink vs White vs Brown Noise: What They Are and How to Use Them",
+    excerpt:
+      "White, pink, and brown noise can each shape attention and relaxation differently. Here is how they work, how they compare, and when to use each one for meditation, sleep, and focus.",
+    heroSummary:
+      "These three background sounds are all forms of broadband noise, but their frequency balance changes how they feel in practice. White noise is brighter, pink noise is smoother, and brown noise is deeper. The right choice depends on your goal: alert masking, steady concentration, or low-frequency calming support.",
+    publishedAt: "2026-02-20",
+    updatedAt: "2026-02-20",
+    readTimeMinutes: 8,
+    category: "Manifestation",
+    tags: ["pink noise", "white noise", "brown noise", "meditation", "entrainment"],
+    seoTitle: "Pink Noise vs White Noise vs Brown Noise | Entrain Blog",
+    seoDescription:
+      "Learn the difference between pink, white, and brown noise, how each affects perceived mental state, and practical ways to use them for meditation, sleep, and focus.",
+    affiliateDisclosure: "This article does not include affiliate product recommendations.",
+    medicalDisclaimer:
+      "This content is for educational purposes only and is not medical advice. Do not use audio tracks while driving or operating machinery.",
+    recommendedProductsHeading: "Recommended Products",
+    sections: [
+      {
+        id: "what-these-noise-types-are",
+        heading: "What White, Pink, and Brown Noise Actually Are",
+        paragraphs: [
+          "All three are continuous sound signals containing many frequencies at once. The key difference is how much energy each frequency range carries.",
+          "White noise distributes energy evenly per frequency band, which makes it sound bright and hiss-like. Pink noise rolls off high frequencies, so it sounds smoother and more balanced. Brown noise emphasizes lower frequencies even more, which gives it a deep rumble quality.",
+          "They are not the same as binaural beats. Binaural tracks use two different tones across left and right channels, while colored noise is a full-spectrum texture used mainly for masking and state support.",
+        ],
+      },
+      {
+        id: "how-they-feel-in-practice",
+        heading: "How They Tend to Feel in Practice",
+        paragraphs: [
+          "White noise can be effective for masking sudden environmental sounds, but some users find it too sharp for long meditation sessions.",
+          "Pink noise is often the most neutral for extended listening. It can feel less intrusive while still helping with sound masking and attention stability.",
+          "Brown noise usually feels heavier and lower. People who are easily overstimulated often prefer it for decompression, sleep prep, or slower breathing work.",
+        ],
+        bulletPoints: [
+          "White noise: bright, crisp, strong masking",
+          "Pink noise: balanced, softer, broadly usable",
+          "Brown noise: deep, warm, often most calming",
+        ],
+      },
+      {
+        id: "brain-entrainment-and-meditation-context",
+        heading: "How This Relates to Brain Entrainment and Meditation",
+        paragraphs: [
+          "Colored noise does not entrain the brain in the same direct way discussed with rhythmic entrainment signals. Its main value is reducing distraction and helping the nervous system settle into a stable sensory background.",
+          "That matters for meditation because fewer abrupt sound interruptions usually means less attentional reset. You stay with breath, body awareness, or visualization for longer blocks.",
+          "In practice, noise tracks are often best treated as context-shaping tools: they improve the conditions for focus and calm rather than forcing a specific mental state.",
+        ],
+      },
+      {
+        id: "which-one-to-use-for-which-goal",
+        heading: "Which Noise Type to Use for Different Goals",
+        paragraphs: [
+          "Choose one type based on your primary outcome, then test it consistently for a week before switching. Constant toggling makes it hard to evaluate signal.",
+        ],
+        bulletPoints: [
+          "Deep work in noisy spaces: start with white or pink noise",
+          "Meditation and breathwork: start with pink or brown noise",
+          "Pre-sleep wind-down: often brown first, pink second",
+          "If a track feels irritating after 10 minutes, switch profile",
+        ],
+      },
+      {
+        id: "simple-testing-protocol",
+        heading: "A Simple 7-Day Testing Protocol",
+        paragraphs: [
+          "Run short controlled tests so your choice is based on outcomes, not first impressions.",
+          "Keep volume moderate and the rest of your routine stable while testing.",
+        ],
+        bulletPoints: [
+          "Days 1-2: white noise, same session length each day",
+          "Days 3-4: pink noise, same timing and environment",
+          "Days 5-6: brown noise, same protocol",
+          "Day 7: pick the best performer and repeat",
+          "Track focus stability, stress level, and session depth",
+        ],
+      },
+      {
+        id: "safety-and-practical-notes",
+        heading: "Safety and Practical Notes",
+        paragraphs: [
+          "Keep volume at comfortable levels, especially for longer sessions or overnight playback.",
+          "If you use tinnitus management strategies or have hearing concerns, discuss long-duration audio use with a qualified clinician.",
+          "The most reliable gains still come from routine quality: regular timing, low evening stimulation, and consistent practice.",
+        ],
+      },
+    ],
+    affiliateProducts: [],
+  },
+  {
     slug: "how-binaural-audio-affects-the-brain-and-how-to-use-it",
     title: "How Binaural Audio Affects the Brain: Science, Use Cases, and Best Practices",
     excerpt:
